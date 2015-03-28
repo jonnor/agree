@@ -70,10 +70,18 @@ agree.ClassInvariantViolated = ClassInvariantViolated
 
 class FunctionContract
     constructor: (@name, @parent, @options) ->
+        @name = 'anonymous function' if not @name
         @postconditions = []
         @preconditions = []
-        @func = () ->
+        @bodyFunction = () ->
             throw new NotImplemented
+
+        call = (instance, args) =>
+            @call instance, args
+        @func = () ->
+            call this, arguments
+        @func.contract = this # back-reference for introspection
+
         defaultOptions =
             checkPrecond: true
             checkClassInvariants: true
@@ -98,18 +106,13 @@ class FunctionContract
         return this
 
     body: (f) ->
-        @func = f
+        @bodyFunction = f
         return this
 
     # Register as ordinary function on
     add: (context, name) ->
         name = @name if not name?
-        call = (instance, args) =>
-            @call instance, args, name
-        func = () ->
-            call this, arguments
-        func.contract = this # back-reference for introspection
-        context[name] = func
+        context[name] = @func
         return this
 
     # Chain up to parent to continue fluent flow there
@@ -117,7 +120,7 @@ class FunctionContract
         return @parent.method.apply @parent, arguments if @parent
 
     # Executing
-    call: (instance, args, name) ->
+    call: (instance, args) ->
         options = @options
 
         if options.checkClassInvariants and instance.contract?
@@ -133,7 +136,7 @@ class FunctionContract
                     else
                         throw new PreconditionFailed @name, cond
 
-        ret = @func.apply instance, args
+        ret = @bodyFunction.apply instance, args
 
         if options.checkPostcond
             for cond in @postconditions
@@ -148,11 +151,15 @@ class FunctionContract
     getClass: () ->
         return @parent?.getClass()
 
+    getFunction: () ->
+        return @func
+
 agree.function = (name, parent, options) ->
     return new FunctionContract name, parent, options
 
 class ClassContract
     constructor: (@name, @options) ->
+        @name = 'anonymous class' if not @name
         @invariants = []
         @initializer = () ->
             # console.log 'ClassContract default initializer'
