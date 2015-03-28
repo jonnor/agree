@@ -1,0 +1,29 @@
+{
+  "name": "agree",
+  "version": "0.0.1",
+  "description": "Introspectable contracts programming for JavaScript",
+  "author": "Jon Nordby <jononor@gmail.com> (http://www.jonnor.com)",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jonnor/agree.git"
+  },
+  "bugs": "http://github.com/jonnor/agree/issues",
+  "license": "MIT",
+  "files": [
+    "src",
+    "index.js"
+  ],
+  "scripts": {
+    "test": "mocha --reporter spec --compilers .coffee:coffee-script/register spec/*.coffee"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "coffee-script": "^1.8.0"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.21.4"
+  }
+}
