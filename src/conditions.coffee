@@ -21,6 +21,14 @@ conditions.noUndefined = () ->
         return false if not a?
     return true
 
+conditions.noUndefined.examples = [
+    name: 'one undefined argument'
+    valid: false
+    create: () -> return conditions.noUndefined
+    context: () -> return null
+    args: [ undefined, 2, 3 ]
+]
+
 conditions.numbersOnly = () ->
     for a in arguments
         return false if typeof a != 'number'

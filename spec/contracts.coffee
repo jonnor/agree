@@ -102,10 +102,3 @@ describe 'ClassContract', ->
     it 'method violating class invariant should throw', ->
         chai.expect(() -> f.setPropNull 2, 3).to.throw agree.ClassInvariantViolated
 
-describe 'Predicates', ->
-    f = null
-    beforeEach ->
-        f = new examples.Foo
-    # TODO: should be autogen from example
-    it 'method violating attributeTypeEqual', () ->
-        chai.expect(() -> f.setNumberWrong()).to.throw agree.ContractFailed
