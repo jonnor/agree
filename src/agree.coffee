@@ -1,37 +1,14 @@
-# Just some rough sketching around how contracts-based programming or
-# programming-by-contracts, design-by-contract could look like in standard
-# CoffeeScript/JavaScript
-# 
-# References
-# - http://en.wikipedia.org/wiki/Design_by_contract
-# - http://c2.com/cgi/wiki?DesignByContract
-# - http://disnetdev.com/contracts.coffee/ custom syntax+compiler based on coffee-script
-# - http://dlang.org/contracts.html built-in support for contracts in D
+# Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
-# Differences from existing implementions
-# - contracts, and functions/classes built with contracts, can be introspected
-# - preconditions can, and should be, used for input validation at runtime
-#
-# Goals
-# - the fact that contracts are used is completely transparent to consuming code
-# - JavaScript-friendly API (even if written with CoffeeScript)
-#
-# Usecases
-# - NoFlo components: verifying data on inports, specifying component behavior
-# - HTTP REST apis: specifying behavior, validating request
-# - Abstractions: multiple implementations of same interface
-#
-# Unresolved questions:
-# - should it be a goal to enable piece-wise/step-by-step integration into existing functions/classes?
-# - should class invariants be explicit on class, or implicit derived from contract-based properties or both?
+# TODO: a way to declare an interface which can be implemented by multiple function/classes
+# TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 #
 # Documentation
+# - add/generate good toString(), for interactive/REPL docs
 # - allow to generate API docs including pre,post,classinvariants
 #
 # Testing
 # - allow to verify all pre,post,classinvariants have been triggered
-# - predicates include positive/negative examples as basic doctests
-#
 #
 # Debugging
 # - ability to log failing predicates, including descritpion, location of fail, reason for fail
@@ -40,12 +17,10 @@
 # Performance
 # - MAYBE: opt-out of postcondition and class invariant checking
 #
-# TODO:
+# Research:
 # - Prototype a way to declare and verify symmetrical functions, ie ones which cancel eachother out
-# - Prototype a way to declare an interface which can be implemented by multiple
 # - Sketch out a way to provide default for pre/post/invar, as an executable/verifiable coding-style
-# - Add possibily for human-readable doc/description on predicates,
-# attach the info to exceptions
+# - Allow class invariants be explicit on class, or implicit derived from contract-based properties or both?
 # - Investigate how to generate useful documentation, both
 # and REPL-like runtime introspection
 #  Use positive and negative example as docs/tests for predicate functions
@@ -57,19 +32,16 @@
 # http://www.coffeelint.org/
 # https://github.com/jashkenas/coffeescript/issues/1466
 #
-# - Add some type checking predicates
-# - Add way to wrap constructor also
-# - Allow a single pre/post/class-invar func in addition to array
-# - Allow to not specify pre/post at all
-# - Consider moving to a fluent interface ala https://www.npmjs.com/package/blueprint
-#   * invariants on properties whould then be done together with declaring them. Specify default, generate constructor?
-# - Consider adding first-class support for Promises instead of functions
 #
-# Random:
+# Random/ideas:
 # - Should contracts and their use be registered globally, for dependency tracking?
 # Could allow tracking whether they are all set up statically or not
-# Also how many of them are excersised by tests. Also a registration target for a test?
-# - 
+#
+# References:
+#
+# - http://c2.com/cgi/wiki?DesignByContract
+# - http://disnetdev.com/contracts.coffee/ custom syntax+compiler based on coffee-script
+# - http://dlang.org/contracts.html built-in support for contracts in D
 
 agree = {}
 
