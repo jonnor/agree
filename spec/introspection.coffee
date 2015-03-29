@@ -54,11 +54,10 @@ describe 'Introspection', ->
             chai.expect(desc).to.contain 'Initable'
             chai.expect(desc).to.contain 'method'
             chai.expect(desc).to.contain 'Initable.dontcallme'
-
     describe 'preconditions', ->
         contract = examples.multiplyByTwo.contract
         it 'can be enumerated', ->
-            chai.expect(contract.preconditions).to.have.length 1
+            chai.expect(contract.preconditions).to.have.length 2
         it 'has description', ->
             chai.expect(contract.preconditions[0].predicate.description).to.equal 'no undefined arguments'
 

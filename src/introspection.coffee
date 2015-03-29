@@ -4,6 +4,9 @@ agree = require '../'
 # TODO: add ability to describe objects as HTML
 # MAYBE: let console/string describe just render the HTML with super simple style
 
+# TODO: add a test for function/method must have preconditions
+# TODO: add a test for function/method must have postconditions
+
 nl = "\n"
 ind = "  "
 

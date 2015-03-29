@@ -1,5 +1,6 @@
 # Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
+# TODO: allow pre/postconditions on init functions
 # TODO: a way to declare an interface which can be implemented by multiple function/classes
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 #

@@ -2,7 +2,7 @@
 # Agree: Introspectable Contracts programming for JavaScript/CoffeeScript
 
 Agree is a library for implementing
-[Design_by_contract](http://en.wikipedia.org/wiki/Design_by_contract) for JavaScript,
+[Design by contract](http://en.wikipedia.org/wiki/Design_by_contract) in JavaScript,
 including `preconditions`, `postconditions` and `class invariants`.
 
 It is inspired by projects like [contracts.coffee](http://disnetdev.com/contracts.coffee),
@@ -24,16 +24,16 @@ test-cases and aid in debugging of failures.
 
 Usecases
 
-- NoFlo components: verifying data on inports, specifying component behavior
+- [NoFlo](http://noflojs.org) components: verifying data on inports, specifying component behavior
 - HTTP REST apis: specifying behavior, validating request, consistent error handling
-- Abstractions: multiple implementations of same interface
+- Abstractions: multiple implementations of same interface fully described
 
 ## Status
 
 **Experimental** as of March 2015.
 
 * Functions, method and simple class invariants work
-* The library has not been used in any real applications yet
+* Library has not been used in any real applications yet
 
 High-level TODO:
 
