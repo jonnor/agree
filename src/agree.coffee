@@ -175,6 +175,7 @@ class ClassContract
             this.contract = self # back-reference for introspection
             construct this, arguments
         @klass.contract = this # back-reference for introspection
+        @klass.toString = () -> return introspection.describe this
 
         defaultOptions =
             checkPrecond: true

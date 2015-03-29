@@ -32,6 +32,12 @@ describe 'Introspection', ->
             chai.expect(examples.InvalidInit.contract).to.be.instanceof agree.ClassContract
         it 'has a name', ->
             chai.expect(examples.InvalidInit.contract.name).to.equal 'InvalidInit'
+        it 'has .toString() description', ->
+            desc = examples.Initable.toString()
+            chai.expect(desc).to.contain 'class'
+            chai.expect(desc).to.contain 'Initable'
+            chai.expect(desc).to.contain 'method'
+            chai.expect(desc).to.contain 'Initable.dontcallme'
     describe 'a class instance', ->
         it 'knows its Contract', ->
             instance = new examples.Initable
@@ -71,7 +77,8 @@ describe 'Spying', ->
     # - not all preconditions hit -> insufficient unhappy cases
     # - postcondition not success -> insufficient happy cases, or buggy code/conditions
     describe 'all preconditions hit', ->
-        it 'can be observed'
+        it 'can be observed',
+
 
     describe 'not all preconditions hit', ->
         it 'can be observed'
