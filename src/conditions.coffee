@@ -11,6 +11,8 @@
 # TODO: considering integration with common expect/assert libraries for checks
 # TODO: add ability to report cause of predicate failure. Via exception??
 #
+# TODO: find a way to ensure that conditions don't have side-effects!
+#
 # Ideas:
 # IDEA: allow to generate/composte conditions out of JSON schemas
 

@@ -66,7 +66,7 @@ describe 'Introspection', ->
         it 'can be enumerated', ->
             chai.expect(contract.postconditions).to.have.length 1
         it 'has description', ->
-            chai.expect(contract.postconditions[0].description).to.equal 'all arguments must be numbers'
+            chai.expect(contract.postconditions[0].predicate.description).to.equal 'all arguments must be numbers'
 
     describe 'class invariants', ->
         contract = examples.InvalidInit.contract
@@ -74,23 +74,35 @@ describe 'Introspection', ->
             chai.expect(contract.invariants).to.have.length 1
         it 'has description'
 
-    # TODO: implement observation of pre/post/class-invariants
-    # - run with some sort of Spy which records events
 
-describe 'Spying', ->
-
+describe 'Observing a function', ->
+    observer = null
+    func = examples.multiplyByTwo
     beforeEach () ->
-
+        observer = agree.introspection.observe func
     afterEach () ->
+        observer.reset()
 
-    # interesting to determine code coverage, failing tests if not 100% 
-    # - not all preconditions hit -> insufficient unhappy cases
-    # - postcondition not success -> insufficient happy cases, or buggy code/conditions
-    describe 'all preconditions hit', ->
-        it 'can be observed',
+    describe 'calling function with valid data', ->
+        it 'causes body-enter and body-leave event', ->
+            func 42
+            names = observer.events.map (e) -> return e.name
+            chai.expect(names).to.include 'body-enter'
+            chai.expect(names).to.include 'body-leave'
+        it 'body-enter event has function arguments', ->
+            func 42
+            events = observer.events.filter (e) -> return e.name == 'body-enter'
+            chai.expect(events).to.have.length 1
+            chai.expect(events[0].data.arguments).to.eql [42], events[0]
 
+        it 'body-leave event has function return values'
+        it 'Observer.toString() has description of events'
 
     describe 'not all preconditions hit', ->
+        it 'failed precondition is marked'
+        it 'passing precondition is marked'
+
+    describe 'all preconditions hit', ->
         it 'can be observed'
 
     describe 'postcondition failing', ->

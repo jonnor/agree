@@ -72,6 +72,23 @@ agree.ContractFailed = ContractFailed
 agree.PostconditionFailed = PostconditionFailed
 agree.ClassInvariantViolated = ClassInvariantViolated
 
+runInvariants = (invariants, instance, args) ->
+    return [] if not instance.contract? # XXX: is this a programming error?
+    results = []
+    for invariant in invariants
+        results.push
+            passed: invariant.apply instance
+            invariant: invariant
+    return results
+
+runConditions = (conditions, instance, args) ->
+    results = []
+    for cond in conditions
+        results.push
+            passed: cond.predicate.apply instance, args
+            condition: cond
+    return results
+
 class FunctionContract
     constructor: (@name, @parent, @options) ->
         @name = 'anonymous function' if not @name
@@ -79,6 +96,7 @@ class FunctionContract
         @preconditions = []
         @bodyFunction = () ->
             throw new NotImplemented
+        @observer = null
 
         call = (instance, args) =>
             @call instance, args
@@ -98,15 +116,18 @@ class FunctionContract
     postcondition: (conditions) ->
         conditions = [conditions] if not conditions.length
         for c in conditions
-            @postconditions.push c
+            o = { predicate: c }
+            @postconditions.push o
         return this
 
     pre: () -> @precondition.apply @, arguments
     precondition: (conditions, onFail) ->
         conditions = [conditions] if not conditions.length
         for c in conditions
+            defaultFail = () ->
+                throw new PreconditionFailed @name, c
             o = { predicate: c }
-            o.onFail = onFail if onFail
+            o.onFail = if onFail then onFail else defaultFail
             @preconditions.push o
         return this
 
@@ -114,50 +135,66 @@ class FunctionContract
         @bodyFunction = f
         return this
 
+    # Chain up to parent to continue fluent flow there
+    method: () ->
+        return @parent.method.apply @parent, arguments if @parent
+
     # Register as ordinary function on
     add: (context, name) ->
         name = @name if not name?
         context[name] = @func
         return this
 
-    # Chain up to parent to continue fluent flow there
-    method: () ->
-        return @parent.method.apply @parent, arguments if @parent
-
-    # Executing
-    call: (instance, args) ->
-        options = @options
-
-        if options.checkClassInvariants and instance.contract?
-            for invariant in instance.contract.invariants
-                pass = invariant.apply instance
-                throw new ClassInvariantViolated if not pass
-        if options.checkPrecond
-            for cond in @preconditions
-                preconditionPassed = cond.predicate.apply instance, args
-                if not preconditionPassed
-                    if cond.onFail
-                        return cond.onFail()
-                    else
-                        throw new PreconditionFailed @name, cond
-
-        ret = @bodyFunction.apply instance, args
-
-        if options.checkPostcond
-            for cond in @postconditions
-                throw new PostconditionFailed @name, cond if not cond.apply instance, args
-        if options.checkClassInvariants and instance.contract?
-            for invariant in instance.contract.invariants
-                pass = invariant.apply instance
-                throw new ClassInvariantViolated if not pass
-
-        return ret
-
+    # Converting to normal function
     getClass: () ->
         return @parent?.getClass()
 
     getFunction: () ->
         return @func
+
+    # Executing
+    call: (instance, args) ->
+        invariants = if instance.contract? then instance.contract.invariants else []
+        argsArray = Array.prototype.slice.call args
+
+        # preconditions
+        preconditions = if not @options.checkPrecond then [] else runConditions @preconditions, instance, args
+        @emit 'preconditions-checked', preconditions
+        failures = preconditions.filter (r) -> return not r.passed
+        return failures[0].condition.onFail() if failures.length
+
+        # invariants pre-check
+        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
+        @emit 'invariants-pre-checked', { invariants: invs, context: instance, arguments: argsArray }
+        failures = invs.filter (r) -> return not r.passed        
+        throw new ClassInvariantViolated @name, failures[0].invariant if failures.length
+
+        # body
+        @emit 'body-enter', { context: instance, arguments: argsArray }
+        ret = @bodyFunction.apply instance, args
+        @emit 'body-leave', { context: instance, arguments: argsArray, returns: ret }
+
+        # invariants post-check
+        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
+        @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
+        failures = invs.filter (r) -> return not r.passed        
+        throw new ClassInvariantViolated @name, failures[0].invariant if failures.length
+
+        # postconditions
+        # FIXME: pass ret and not args to postconditions!!!
+        postconditions = if not @options.checkPostcond then [] else runConditions @postconditions, instance, args
+        @emit 'postconditions-checked', postconditions
+        failures = postconditions.filter (r) -> return not r.passed
+        throw new PostconditionFailed @name, failures[0].condition if failures.length
+
+        return ret
+
+    # Observing events
+    observe: (eventHandler) ->
+        @observer = eventHandler
+
+    emit: (eventName, payload) ->
+        @observer eventName, payload if @observer
 
 agree.FunctionContract = FunctionContract
 agree.function = (name, parent, options) ->
@@ -169,6 +206,7 @@ class ClassContract
         @invariants = []
         @initializer = () ->
             # console.log 'ClassContract default initializer'
+        @observer = null
 
         self = this
         construct = (instance, args) =>
@@ -213,10 +251,15 @@ class ClassContract
         @initializer.apply instance, args
 
         # Check class invariants
+        # FIXME: share this code with FunctionContract.runInvariants
         if @options.checkClassInvariants
             for invariant in instance.contract?.invariants
                 throw new ClassInvariantViolated if not invariant.apply instance
         return instance
+
+    # Observing events
+    observe: (eventHandler) ->
+        @observer = eventHandler
 
     getClass: ->
         return @klass

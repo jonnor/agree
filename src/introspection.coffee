@@ -68,3 +68,40 @@ exports.describe = (thing) ->
 
     output = 'Unknown contract'
     return output
+
+# XXX: right now can only observe one thing, which might be too inconvenient in practice
+# should possibly observe a set of things. Issue is that then event monitoring / analysis also needs to take filter
+class Observer
+    constructor: (@thing) ->
+        @reset()
+
+        if @thing.contract
+            @thing.contract.observe (event, data) =>
+                @onEvent event, data
+
+    reset: () ->
+        @events = []
+        @thing.contract.observe null if @thing.contract
+
+    onEvent: (eventName, payload) ->
+        @events.push
+            name: eventName
+            data: payload
+        @emit 'event', eventName, payload
+        # MAYBE: emit specific events? 'precondition-failed' etc
+
+    emit: (m, args) ->
+        # TODO: allow to follow events as they happen
+
+    toString: () ->
+        # TODO: event-aware toString() formatting
+        # TODO: colorize failures
+        lines = []
+        for event in @events
+            lines.push "#{event.name}: #{event.data.toString()}"
+        return lines.join '\n'
+
+exports.Observer = Observer
+exports.observe = (thing) ->
+    return new Observer thing
+
