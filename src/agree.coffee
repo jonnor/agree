@@ -172,6 +172,7 @@ class ClassContract
         construct = (instance, args) =>
             @construct instance, args
         @klass = () ->
+            this.toString = () -> return introspection.describe this
             this.contract = self # back-reference for introspection
             construct this, arguments
         @klass.contract = this # back-reference for introspection

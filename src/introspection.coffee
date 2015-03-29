@@ -40,9 +40,15 @@ tryDescribeClass = (thing, prefix) ->
     return null if not contract
     return null if contract.constructor.name != 'ClassContract'
 
-    output = prefix+"class #{contract.name}"
+    type = if typeof thing == 'object' then "instance" else "class"
+
+    output = prefix+"#{type} #{contract.name}"
     for name, prop of thing.prototype
-        output += tryDescribeFunction prop, prefix+ind
+        out = tryDescribeFunction prop, prefix+ind
+        output += out if out
+    for name, prop of thing
+        out = tryDescribeFunction prop, prefix+ind
+        output += out if out
 
     return output
 

@@ -26,7 +26,12 @@ describe 'Introspection', ->
         it 'knows the Contract of its class', ->
             chai.expect(instance.dontcallme.contract.parent).to.be.instanceof agree.ClassContract
             chai.expect(instance.dontcallme.contract.parent.name).to.equal 'Initable'
-        it 'has .toString() description'
+        it 'has .toString() description', ->
+            desc = agree.introspection.describe instance.dontcallme
+            chai.expect(desc).to.contain 'method'
+            chai.expect(desc).to.contain 'dontcallme'
+            chai.expect(desc).to.contain 'Initable'
+            chai.expect(desc).to.contain 'body'
     describe 'a class', () ->
         it 'knows its Contract', ->
             chai.expect(examples.InvalidInit.contract).to.be.instanceof agree.ClassContract
@@ -42,7 +47,13 @@ describe 'Introspection', ->
         it 'knows its Contract', ->
             instance = new examples.Initable
             chai.expect(instance.contract).to.be.instanceof agree.ClassContract
-        it 'has .toString() description'
+        it 'has .toString() description', ->
+            instance = new examples.Initable
+            desc = instance.toString()
+            chai.expect(desc).to.contain 'instance'
+            chai.expect(desc).to.contain 'Initable'
+            chai.expect(desc).to.contain 'method'
+            chai.expect(desc).to.contain 'Initable.dontcallme'
 
     describe 'preconditions', ->
         contract = examples.multiplyByTwo.contract
