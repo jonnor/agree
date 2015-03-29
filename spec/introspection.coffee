@@ -111,12 +111,12 @@ describe 'Observing a function', ->
                 func "notnumber"
             catch e
                 # ignored, observing it
-        it 'failed precondition is marked', ->
+        it 'can get failed precondition', ->
             events = observer.events.filter (e) -> return e.name == 'preconditions-checked'
             failing = events[0].data.filter (c) -> return c.passed == false
             chai.expect(failing).to.be.length 1
             chai.expect(failing[0].condition.predicate.description).to.equal "all arguments must be numbers"
-        it 'passing precondition is marked', ->
+        it 'can get passing precondition', ->
             events = observer.events.filter (e) -> return e.name == 'preconditions-checked'
             passing = events[0].data.filter (c) -> return c.passed == true
             chai.expect(passing).to.be.length 1
