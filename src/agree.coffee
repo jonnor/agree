@@ -1,11 +1,12 @@
 # Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
 # TODO: allow pre/postconditions on init functions
+# TODO: allow to declare properties, and invariants on them, using ES5 Object.defineProperty
+# https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
 # TODO: a way to declare an interface which can be implemented by multiple function/classes
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 #
 # Documentation
-# - add/generate good toString(), for interactive/REPL docs
 # - allow to generate API docs including pre,post,classinvariants
 #
 # Testing
