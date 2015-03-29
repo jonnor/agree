@@ -10,15 +10,13 @@ describe 'Introspection', ->
             chai.expect(examples.multiplyByTwo.contract).to.be.instanceof agree.FunctionContract
         it 'has a name', ->
             chai.expect(examples.multiplyByTwo.contract.name).to.equal 'multiplyByTwo'
-        it 'can be described', ->
-            desc = agree.introspection.describe examples.multiplyByTwo
+        it 'has .toString() description', ->
+            desc = examples.multiplyByTwo.toString()
             chai.expect(desc).to.contain 'multiplyByTwo'
             chai.expect(desc).to.contain 'no undefined'
             chai.expect(desc).to.contain 'must be numbers'
             chai.expect(desc).to.contain 'body'
             chai.expect(desc).to.contain 'function'
-            console.log desc
-
     describe 'a method', () ->
         instance = new examples.Initable
         it 'knows its Contract', ->
@@ -28,6 +26,7 @@ describe 'Introspection', ->
         it 'knows the Contract of its class', ->
             chai.expect(instance.dontcallme.contract.parent).to.be.instanceof agree.ClassContract
             chai.expect(instance.dontcallme.contract.parent.name).to.equal 'Initable'
+        it 'has .toString() description'
     describe 'a class', () ->
         it 'knows its Contract', ->
             chai.expect(examples.InvalidInit.contract).to.be.instanceof agree.ClassContract
@@ -37,6 +36,7 @@ describe 'Introspection', ->
         it 'knows its Contract', ->
             instance = new examples.Initable
             chai.expect(instance.contract).to.be.instanceof agree.ClassContract
+        it 'has .toString() description'
 
     describe 'preconditions', ->
         contract = examples.multiplyByTwo.contract

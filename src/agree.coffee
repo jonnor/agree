@@ -45,6 +45,8 @@
 
 agree = {}
 
+introspection = require './introspection'
+
 # Framework
 class ContractFailed extends Error
 
@@ -81,6 +83,7 @@ class FunctionContract
         @func = () ->
             call this, arguments
         @func.contract = this # back-reference for introspection
+        @func.toString = () -> return introspection.describe this
 
         defaultOptions =
             checkPrecond: true
