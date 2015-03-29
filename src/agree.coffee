@@ -1,31 +1,31 @@
 # Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
+# Contracts
 # TODO: allow pre/postconditions on init functions
 # TODO: allow to declare properties, and invariants on them, using ES5 Object.defineProperty
 # https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-# TODO: a way to declare an interface which can be implemented by multiple function/classes
+# TODO: a way to declare an interface (pre,post,invar) which can be implemented by multiple function/classes
+# TODO: allow to use contract interface as an executable coding style
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
+# TODO: A way to declare and verify symmetrical functions, ie ones which cancel eachother out
+# requires to defined equality operators, over some context/domain?
+# example: increment()/decrement(), init()/reset(), push()/pop()
 #
 # Documentation
-# - allow to generate API docs including pre,post,classinvariants
+# - TODO: allow to generate HTML API docs; including pre,post,classinvariants
 #
 # Testing
-# - allow to verify all pre,post,classinvariants have been triggered
+# - TODO: allow to verify all pre,post,classinvariants have been triggered
+# - MAYBE: allow to go over all declared
 #
 # Debugging
-# - ability to log failing predicates, including descritpion, location of fail, reason for fail
-# - ability to cause failing predicate to cause breakpoint using `debugger` statement
+# - TODO: ability to log failing predicates, including descritpion, location of fail, reason for fail
+# - TODO: ability to cause failing predicate to cause breakpoint using `debugger` statement
 #
 # Performance
 # - MAYBE: opt-out of postcondition and class invariant checking
 #
 # Research:
-# - Prototype a way to declare and verify symmetrical functions, ie ones which cancel eachother out
-# - Sketch out a way to provide default for pre/post/invar, as an executable/verifiable coding-style
-# - Allow class invariants be explicit on class, or implicit derived from contract-based properties or both?
-# - Investigate how to generate useful documentation, both
-# and REPL-like runtime introspection
-#  Use positive and negative example as docs/tests for predicate functions
 # - Investigate how unit tests can be generated from introspected
 # invariants, or how checks can replace unit tests for simple cases
 # - Investigate to which extent invariants can be statically checked,
