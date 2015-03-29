@@ -46,7 +46,7 @@ For details see TODO/FIXME/XXX/MAYBE comments in the code.
 
 ## Examples
 
-See the tests under [./spec/] for full reference
+See the tests under [./spec/](./spec) for full reference
 
     agree = require 'agree'
     c = agree.conditions
@@ -65,7 +65,8 @@ See the tests under [./spec/] for full reference
     .getFunction()
 
     # use the function
-    addNumbers undefined 2 # -> got undefined
-    addNumbers "foo", "baar"  # -> not numbers!
+    addNumbers undefined, 2      # -> got undefined!
+    addNumbers "foo", "baar"     # -> not numbers!
+    addNumbers 2, 3              # -> returns 5
 
     # TODO: examples for introspection-based docs and testing

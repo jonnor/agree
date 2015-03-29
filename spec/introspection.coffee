@@ -58,8 +58,29 @@ describe 'Introspection', ->
             chai.expect(contract.invariants).to.have.length 1
         it 'has description'
 
-    # TODO: list pre/post/invariants, execute functions, compare how many ran/failed to available
+    # TODO: implement observation of pre/post/class-invariants
+    # - run with some sort of Spy which records events
+
+describe 'Spying', ->
+
+    beforeEach () ->
+
+    afterEach () ->
+
+    # interesting to determine code coverage, failing tests if not 100% 
+    # - not all preconditions hit -> insufficient unhappy cases
+    # - postcondition not success -> insufficient happy cases, or buggy code/conditions
+    describe 'all preconditions hit', ->
+        it 'can be observed'
+
+    describe 'not all preconditions hit', ->
+        it 'can be observed'
+
     describe 'postcondition failing', ->
+        it 'can be observed'
+
     describe 'postcondition never called', ->
+        it 'can be observed'
+
 
 

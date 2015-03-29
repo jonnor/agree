@@ -1,6 +1,9 @@
 
 agree = require '../'
 
+# TODO: add ability to describe objects as HTML
+# MAYBE: let console/string describe just render the HTML with super simple style
+
 # Return information
 exports.describe = (thing) ->
     return "Unknown contract" if not thing.contract?
