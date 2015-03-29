@@ -93,7 +93,7 @@ describe 'ClassContract', ->
     it 'initializer shall be called', ->
         chai.expect(f.prop1).to.equal "foo"
     it 'initializer violating class invariant should throw', ->
-        chai.expect(examples.InvalidInit).to.throw agree.ClassInvariantViolated
+        chai.expect(() -> new examples.InvalidInit).to.throw agree.ClassInvariantViolated
     it 'method violating class invariant should throw', ->
         chai.expect(() -> f.setPropNull 2, 3).to.throw agree.ClassInvariantViolated
 
