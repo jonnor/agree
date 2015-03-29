@@ -20,6 +20,7 @@ conditions.noUndefined = () ->
     for a in arguments
         return false if not a?
     return true
+conditions.noUndefined.description = "no undefined arguments" 
 
 conditions.noUndefined.examples = [
     name: 'one undefined argument'
@@ -33,6 +34,7 @@ conditions.numbersOnly = () ->
     for a in arguments
         return false if typeof a != 'number'
     return true
+conditions.numbersOnly.description = "all arguments must be numbers"
 
 # parametric functions, returns a predicate
 conditions.neverNull = (attribute) ->

@@ -154,6 +154,7 @@ class FunctionContract
     getFunction: () ->
         return @func
 
+agree.FunctionContract = FunctionContract
 agree.function = (name, parent, options) ->
     return new FunctionContract name, parent, options
 
@@ -212,6 +213,8 @@ class ClassContract
 
     getClass: ->
         return @klass
+
+agree.ClassContract = ClassContract
 
 agree.Class = (name) ->
     return new ClassContract name

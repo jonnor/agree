@@ -1,10 +1,8 @@
 chai = require 'chai'
 agree = require '../'
+examples = require './examples'
 
 conditions = agree.conditions
-
-# Examples
-examples = {}
 
 agree.Class 'Foo'
 .add examples
@@ -45,31 +43,15 @@ agree.function 'setPropWrong'
 .body () ->
     @prop1 = 'nobar'
 
-# Invalid init
-agree.Class 'InvalidInit'
-.invariant conditions.neverNull 'prop1'
-.init () ->
-    @prop1 = null
-.add examples
-
 describe 'FunctionContract', ->
     f = null
     beforeEach ->
         f = new examples.Foo
 
-
     it 'function with valid arguments should succeed', ->
-        func = agree.function()
-        .pre conditions.noUndefined
-        .body (input) -> return input*2
-        .getFunction()
-        chai.expect(func 13).to.equal 26
+        chai.expect(examples.multiplyByTwo 13).to.equal 26
     it 'function with failing precondition should throw', ->
-        func = agree.function()
-        .pre conditions.noUndefined
-        .getFunction()
-        chai.expect(() -> func undefined).to.throw agree.PreconditionFailed
-
+        chai.expect(() -> examples.multiplyByTwo undefined).to.throw agree.PreconditionFailed
     it 'method with valid arguments should succeed', ->
         chai.expect(f.addNumbers(1, 2)).to.equal 3
     it 'method with failing precondition should throw', ->
