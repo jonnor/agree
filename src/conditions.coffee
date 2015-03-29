@@ -3,6 +3,7 @@
 # tailor to particular program need.
 #
 # TODO: add names/descriptions to conditions, for better introspection
+# FIXME: find a better, general, solution for the toJSON stuff
 # TODO: let predicates declare positive/negative examples, use as doc+tests
 # TODO: generalize the composition/parametrization of predicates?
 # - look up an identifier (string, number) in some context (arguments, this)
@@ -31,12 +32,14 @@ conditions.noUndefined.examples = [
     context: () -> return null
     args: [ undefined, 2, 3 ]
 ]
+conditions.noUndefined.toJSON = () -> return this.description
 
 conditions.numbersOnly = () ->
     for a in arguments
         return false if typeof a != 'number'
     return true
 conditions.numbersOnly.description = "all arguments must be numbers"
+conditions.numbersOnly.toJSON = () -> return this.description
 
 # parametric functions, returns a predicate
 conditions.neverNull = (attribute) ->

@@ -97,8 +97,12 @@ class Observer
         # TODO: event-aware toString() formatting
         # TODO: colorize failures
         lines = []
+        lines.push "agree.Observer: #{@events.length} events"
         for event in @events
-            lines.push "#{event.name}: #{event.data.toString()}"
+            data = JSON.stringify event.data, (key, val) ->
+                # avoid circular reference when context is global
+                return if key == 'context' and val.global? then 'global' else val
+            lines.push "  #{event.name}: #{data}"
         return lines.join '\n'
 
 exports.Observer = Observer

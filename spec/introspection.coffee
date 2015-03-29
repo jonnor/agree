@@ -83,27 +83,44 @@ describe 'Observing a function', ->
     afterEach () ->
         observer.reset()
 
-    describe 'calling function with valid data', ->
-        it 'causes body-enter and body-leave event', ->
+    describe 'all preconditions fulfilled', ->
+        beforeEach () ->
             func 42
+        it 'causes body-enter and body-leave event', ->
             names = observer.events.map (e) -> return e.name
             chai.expect(names).to.include 'body-enter'
             chai.expect(names).to.include 'body-leave'
         it 'body-enter event has function arguments', ->
-            func 42
             events = observer.events.filter (e) -> return e.name == 'body-enter'
             chai.expect(events).to.have.length 1
             chai.expect(events[0].data.arguments).to.eql [42], events[0]
+        it 'body-leave event has function return values', ->
+            events = observer.events.filter (e) -> return e.name == 'body-leave'
+            chai.expect(events).to.have.length 1
+            chai.expect(events[0].data.returns).to.eql 84
+        it 'Observer.toString() has description of events', ->
+            desc = observer.toString()
+            chai.expect(desc).to.contain 'body-enter'
+            chai.expect(desc).to.contain 'body-leave'
+            chai.expect(desc).to.contain 'preconditions-checked'
+            chai.expect(desc).to.contain 'postconditions-checked'
 
-        it 'body-leave event has function return values'
-        it 'Observer.toString() has description of events'
-
-    describe 'not all preconditions hit', ->
-        it 'failed precondition is marked'
-        it 'passing precondition is marked'
-
-    describe 'all preconditions hit', ->
-        it 'can be observed'
+    describe 'some preconditions failing', ->
+        beforeEach () ->
+            try
+                func "notnumber"
+            catch e
+                # ignored, observing it
+        it 'failed precondition is marked', ->
+            events = observer.events.filter (e) -> return e.name == 'preconditions-checked'
+            failing = events[0].data.filter (c) -> return c.passed == false
+            chai.expect(failing).to.be.length 1
+            chai.expect(failing[0].condition.predicate.description).to.equal "all arguments must be numbers"
+        it 'passing precondition is marked', ->
+            events = observer.events.filter (e) -> return e.name == 'preconditions-checked'
+            passing = events[0].data.filter (c) -> return c.passed == true
+            chai.expect(passing).to.be.length 1
+            chai.expect(passing[0].condition.predicate.description).to.equal "no undefined arguments"
 
     describe 'postcondition failing', ->
         it 'can be observed'
