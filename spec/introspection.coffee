@@ -10,6 +10,15 @@ describe 'Introspection', ->
             chai.expect(examples.multiplyByTwo.contract).to.be.instanceof agree.FunctionContract
         it 'has a name', ->
             chai.expect(examples.multiplyByTwo.contract.name).to.equal 'multiplyByTwo'
+        it 'can be described', ->
+            desc = agree.introspection.describe examples.multiplyByTwo
+            chai.expect(desc).to.contain 'multiplyByTwo'
+            chai.expect(desc).to.contain 'no undefined'
+            chai.expect(desc).to.contain 'must be numbers'
+            chai.expect(desc).to.contain 'body'
+            chai.expect(desc).to.contain 'function'
+            console.log desc
+
     describe 'a method', () ->
         instance = new examples.Initable
         it 'knows its Contract', ->
