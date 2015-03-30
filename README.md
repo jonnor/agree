@@ -37,9 +37,10 @@ Usecases
 
 High-level TODO:
 
-* Add helpers/API for introspection for testing/documentation
+* Add more helpers for debugging/testing/documentation
 * Add async support; Promises and node.js style callbacks
-* Add support for contract interfaces, allow reusing multiple times
+* Add support for contract interfaces, allow reusing a contract multiple times
+* Add support for more types of invariants, including on properties
 
 For details see TODO/FIXME/XXX/MAYBE comments in the code.
 
@@ -64,9 +65,15 @@ See the tests under [./spec/](./spec) for full reference
         return a+b
     .getFunction()
 
-    # use the function
-    addNumbers undefined, 2      # -> got undefined!
-    addNumbers "foo", "baar"     # -> not numbers!
-    addNumbers 2, 3              # -> returns 5
+    # observe the function
+    observer = agree.introspection.observe addNumbers
 
-    # TODO: examples for introspection-based docs and testing
+    # use the function
+    addNumbers undefined, 2      # stdout: got undefined!
+    addNumbers "foo", "baar"     # stdout: not numbers!
+    addNumbers 2, 3              # returns 5
+
+    console.log observer         # will print out the events, including failing/passing pre/post conditions
+
+    # TODO: add example of checking test coverage, fuzzing
+
