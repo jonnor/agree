@@ -14,6 +14,10 @@ Functions, classes and instances built with Agree know their associated contract
 This allows to query the code about its properties, to generate documentation,
 test-cases and aid in debugging of failures.
 
+Agree is partially related other work on introspectable programming,
+including [Finito](http://finitosm.org) (finite state machines)
+and [NoFlo](http://noflojs.org)/[MicroFlo](http://microflo.org) (dataflow).
+
 ## Goals
 
 - No special dependencies, works anywhere (browser, node.js, etc)
@@ -76,4 +80,6 @@ See the tests under [./spec/](./spec) for full reference
     console.log observer         # will print out the events, including failing/passing pre/post conditions
 
     # TODO: add example of checking test coverage, fuzzing
+
+
 
