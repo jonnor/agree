@@ -1,15 +1,17 @@
 # Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
 # Contracts
-# TODO: allow pre/postconditions on init functions
+# TODO: allow pre/postconditions on init/constructor functions
 # TODO: allow to declare properties, and invariants on them, using ES5 Object.defineProperty
 # https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
 # TODO: a way to declare an interface (pre,post,invar) which can be implemented by multiple function/classes
-# TODO: allow to use contract interface as an executable coding style
+# TODO: allow/encourage to attach failing and passing examples to contract, use for tests of the contract/predicate itself
+# TODO: allow to use a set of contract interface as an executable coding style
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 # TODO: A way to declare and verify symmetrical functions, ie ones which cancel eachother out
 # requires to defined equality operators, over some context/domain?
 # example: increment()/decrement(), init()/reset(), push()/pop()
+# MAYBE: allow to 'inherit' when replacing a function, on object or prototype
 #
 # Documentation
 # - TODO: allow to generate HTML API docs; including pre,post,classinvariants
@@ -17,13 +19,15 @@
 # Testing
 # - TODO: allow to verify all pre,post,classinvariants have been triggered
 # - MAYBE: allow to go over all declared
+# - MAYBE: allow to cause a contract used by a function to fail, to check error handling
+# - MAYBE: do fuzz testing, to determine input conditions that pass precondition but fails postcond?
 #
 # Debugging
-# - TODO: ability to log failing predicates, including descritpion, location of fail, reason for fail
+# - TODO: ability to log failing predicates, including description, location of fail, reason for fail
 # - TODO: ability to cause failing predicate to cause breakpoint using `debugger` statement
 #
 # Performance
-# - MAYBE: opt-out of postcondition and class invariant checking
+# - MAYBE: allow opt-out of postcondition and class invariant checking
 #
 # Research:
 # - Investigate how unit tests can be generated from introspected
@@ -33,6 +37,8 @@
 # http://coffeescript.org/documentation/docs/nodes.html
 # http://www.coffeelint.org/
 # https://github.com/jashkenas/coffeescript/issues/1466
+# - investigate composition of contracts through Promises,
+# can we reason about the chain of promises / sub-promises?
 #
 #
 # Random/ideas:
@@ -52,6 +58,7 @@ introspection = require './introspection'
 # Framework
 class ContractFailed extends Error
 
+# TODO: attach contract and failure info to the Error object
 class PreconditionFailed extends ContractFailed
     constructor: (name, cond) ->
        @message = "#{name}: #{cond?.name}"
@@ -89,6 +96,7 @@ runConditions = (conditions, instance, args) ->
             condition: cond
     return results
 
+# FIXME: namespace the .contract backref, should be something like _agreeContract, to avoid collisions
 class FunctionContract
     constructor: (@name, @parent, @options) ->
         @name = 'anonymous function' if not @name

@@ -10,7 +10,7 @@
 # - take a value for the instance of a set (types, values) to check for 
 # TODO: consider fluent interface for condition compositon
 # TODO: considering integration with common expect/assert libraries for checks
-# TODO: add ability to report cause of predicate failure. Via exception??
+# TODO: add ability to report cause of predicate failure. Via exception?? or return Error object
 #
 # TODO: find a way to ensure that conditions don't have side-effects!
 #

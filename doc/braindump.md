@@ -48,10 +48,11 @@ looking at differences in input/output/conditions
 * Ability to see relationships between contracts,
 including same-level and hierarchies
 
-Testing
+Testing/QA
 
 * Ability to know code test coverage,
 including verification exhaustiveness
+* Ability to calculate complexity
 
 Documentation
 
