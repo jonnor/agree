@@ -30,18 +30,18 @@ agree.Class 'Foo'
 
 # TODO: allow to reuse/name the contract, and use different body/name
 agree.function 'setPropCorrect'
-.add examples.Foo.prototype
 .pre conditions.noUndefined
 .post [conditions.attributeEquals 'prop1', 'bar']
 .body () ->
     @prop1 = 'bar'
+.add examples.Foo.prototype
 
 agree.function 'setPropWrong'
-.add examples.Foo.prototype
 .precondition conditions.noUndefined
 .postcondition [conditions.attributeEquals 'prop1', 'bar']
 .body () ->
     @prop1 = 'nobar'
+.add examples.Foo.prototype
 
 describe 'FunctionContract', ->
     f = null

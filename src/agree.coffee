@@ -158,22 +158,18 @@ class FunctionEvaluator
         # success
         return ret
     
+
+wrapFunc = (self) ->
+    return () ->
+        instance = this
+        evaluator = self.func._agreeEvaluator
+        evaluator.run instance, arguments, self
+
 class FunctionContract
-    constructor: (@name, @parent, @options = {}) ->
+    constructor: (@name, @parent, @options = {}, @parentname) ->
         @name = 'anonymous function' if not @name
         @postconditions = []
         @preconditions = []
-
-        # FIXME: move to concept of 'applying a contract' to a function, returning wrapped function
-        call = (instance, args) =>
-            @call instance, args
-        @func = () ->
-            call this, arguments
-        evaluator = new FunctionEvaluator null, @options
-        @func._agreeContract = this # back-reference for introspection
-        @func._agreeEvaluator = evaluator # back-reference for introspection
-        @func.toString = () ->
-            return introspection.describe this
 
         defaultOptions =
             checkPrecond: true
@@ -183,18 +179,25 @@ class FunctionContract
             @options[k] = v if not @options[k]?
 
     # deprecated
-    call: (instance, args) ->
-        #contract = agree.getContract instance
-        evaluator = @func._agreeEvaluator
-        evaluator.run instance, args, this
-    body: (f) ->
-        @func._agreeEvaluator.bodyFunction = f
-        return this
-    getFunction: () ->
-        return @func
     observe: (eventHandler) ->
         @func?._agreeEvaluator.observer = eventHandler
 
+    # attach this Contract to an external function
+    attach: (func) ->
+        @func = wrapFunc this
+        evaluator = new FunctionEvaluator null, @options
+        @func._agreeContract = this # back-reference for introspection
+        @func._agreeEvaluator = evaluator # back-reference for introspection
+        @func.toString = () ->
+            return introspection.describe this
+        @func._agreeEvaluator.bodyFunction = func
+        return @func
+
+    body: (func) ->
+        f = @attach func
+        if @parent and @parentname
+            @parent.klass.prototype[@parentname] = f
+        return this
 
     ## Fluent construction
     post: () -> @postcondition.apply @, arguments
@@ -220,7 +223,7 @@ class FunctionContract
     method: () ->
         return @parent.method.apply @parent, arguments if @parent
 
-    # Register as ordinary function on
+    # Register as ordinary function on @context
     add: (context, name) ->
         name = @name if not name?
         context[name] = @func
@@ -232,8 +235,8 @@ class FunctionContract
 
 
 agree.FunctionContract = FunctionContract
-agree.function = (name, parent, options) ->
-    return new FunctionContract name, parent, options
+agree.function = (name, parent, options, pname) ->
+    return new FunctionContract name, parent, options, pname
 
 class ClassContract
     constructor: (@name, @options) ->
@@ -260,9 +263,9 @@ class ClassContract
         @options = defaultOptions # FIXME: don't override
 
     # add a method
-    method: (name) ->
-        f = agree.function "#{@name}.#{name}", this
-        return f.add @klass.prototype, name
+    method: (name, opts) ->
+        f = agree.function "#{@name}.#{name}", this, opts, name
+        return f
 
     # add constructor
     init: (f) ->

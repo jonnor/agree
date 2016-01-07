@@ -5,9 +5,8 @@ exports.multiplyByTwo = agree.function 'multiplyByTwo'
 .pre agree.conditions.noUndefined
 .pre agree.conditions.numbersOnly
 .post agree.conditions.numbersOnly
-.body (input) ->
+.attach (input) ->
     return input*2
-.getFunction()
 
 
 # Invalid init
