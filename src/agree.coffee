@@ -2,8 +2,10 @@
 #
 # Contracts core
 # FIXME: pre/postconditions should be proper objects
-#    - 
+#    - in the chainable API, should be
 #    - see TODO in ./conditions.coffee
+# FIXME: add default error/precondfail reporting.
+#    - .error 'throws' | 'callback' ?
 # TODO: a way to declare an interface (pre,post,invar) which can be implemented by multiple function/classes
 #    - need to separate out the Contract object, and the evaluation of the contract.
 #    - one Contract should be attachable to multiple functions/classes
@@ -12,6 +14,7 @@
 #
 # Later
 #
+# TODO: allow to compose Contracts and/or have multiple on one function/class
 # TODO: allow pre/postconditions on init/constructor functions
 # TODO: allow to declare properties, and invariants on them, using ES5 Object.defineProperty
 # https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty

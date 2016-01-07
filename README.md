@@ -6,7 +6,7 @@ Agree is a library for implementing
 including `preconditions`, `postconditions` and `class invariants`.
 
 It is inspired by projects like [contracts.coffee](http://disnetdev.com/contracts.coffee),
-but requires no build steps or non-standard language features, and is *introspectable*.
+but requires *no build steps* or *no non-standard language features*, and is *introspectable*.
 
 ## Introspection
 
