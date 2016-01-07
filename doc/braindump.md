@@ -133,9 +133,29 @@ Input data normally used in (unit/behaviour) tests could be good real-life
 examples for predicates. Ideally one could declare them one place,
 and would be able to act in both capabilities.
 
+## Predicate examples and generative testing
+
+The manually provided examples are good, and neccesary basis,
+for being able to generate testcases and to reason about.
+
+However, it is easy to miss some cases this way. Or put alternatively,
+it is unreasonably tedious to ensure (up front) that this covers everything.
+
+TODO: move fuzz/mutation tools from poly-test out to a dedicated library, that Agree can use?
+
+If doing this well, hopefully get to the point where primarily doing 'automated-testing-by-example'.
+That is, instead of: setting up a testing framework, writing testcases in imperative code,
+somewhere else than the code-under-test, one:
+- writes code in a way that describes what is valid & not
+- providing a couple of representative examples (some valid, some invalid)
+- tools use this information to create & run testcases
+- a whole set of testcases is created automatically
+- they can be found & ran without any further setup
+
 ## Fault injection
 
-Since we know the preconditions, and have examples which
+Since we know the preconditions, and have in/valid examples, we can use these as basis for
+[fault injection](https://en.wikipedia.org/wiki/Fault_injection).
 
 For instance in a msgflo-noflo scenario:
 * Agree is used for/inside a NoFlo component

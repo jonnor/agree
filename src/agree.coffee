@@ -1,13 +1,20 @@
 # Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
-# Contracts
+# Contracts core
+# FIXME: pre/postconditions should be proper objects
+#    - 
+#    - see TODO in ./conditions.coffee
+# TODO: a way to declare an interface (pre,post,invar) which can be implemented by multiple function/classes
+#    - need to separate out the Contract object, and the evaluation of the contract.
+#    - one Contract should be attachable to multiple functions/classes
+#    - for observing, need to be able to find/hook up the evaluation part
+# TODO: add first-class support for Promises, wrapper for node.js type async callbacks
+#
+# Later
+#
 # TODO: allow pre/postconditions on init/constructor functions
 # TODO: allow to declare properties, and invariants on them, using ES5 Object.defineProperty
 # https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
-# TODO: a way to declare an interface (pre,post,invar) which can be implemented by multiple function/classes
-# TODO: allow/encourage to attach failing and passing examples to contract, use for tests of the contract/predicate itself
-# TODO: allow to use a set of contract interface as an executable coding style
-# TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 # TODO: A way to declare and verify symmetrical functions, ie ones which cancel eachother out
 # requires to defined equality operators, over some context/domain?
 # example: increment()/decrement(), init()/reset(), push()/pop()
@@ -17,6 +24,9 @@
 # - TODO: allow to generate HTML API docs; including pre,post,classinvariants
 #
 # Testing
+# - TODO: allow to attach examples to a Contract, both for failing cases, and for passing.
+#   - should include the expected result information
+#   - use this to automatically create test-cases
 # - TODO: allow to verify all pre,post,classinvariants have been triggered
 # - MAYBE: allow to go over all declared
 # - MAYBE: allow to cause a contract used by a function to fail, to check error handling
@@ -39,7 +49,7 @@
 # https://github.com/jashkenas/coffeescript/issues/1466
 # - investigate composition of contracts through Promises,
 # can we reason about the chain of promises / sub-promises?
-#
+# - investigate using a set of contract interface as an executable coding style
 #
 # Random/ideas:
 # - Should contracts and their use be registered globally, for dependency tracking?

@@ -2,15 +2,18 @@
 # Some of these can be generic and provided by framework, parametriced to 
 # tailor to particular program need.
 #
-# TODO: add names/descriptions to conditions, for better introspection
-# FIXME: find a better, general, solution for the toJSON stuff
-# TODO: let predicates declare positive/negative examples, use as doc+tests
+# TODO: make Conditions _have a_ predicate function, instead of be one
+#  - also take name and description, for better introspection
+# TODO: allow/encourage to attach failing and passing examples to contract,
+#  - use for tests/doc of the contract/predicate itself
+#  - basis for further reasoning, ref doc/brainstorm.md
+#  - .precondition(kkk).valid(barisbaz: { bar: baz }).invalid(missingbar: { foo: bar })
+#
 # TODO: generalize the composition/parametrization of predicates?
 # - look up an identifier (string, number) in some context (arguments, this)
 # - take a value for the instance of a set (types, values) to check for 
-# TODO: consider fluent interface for condition compositon
 # TODO: considering integration with common expect/assert libraries for checks
-# TODO: add ability to report cause of predicate failure. Via exception?? or return Error object
+# FIXME: return Error object with cause of predicate failure, for better introspection
 #
 # TODO: find a way to ensure that conditions don't have side-effects!
 #
