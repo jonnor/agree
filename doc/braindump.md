@@ -99,26 +99,56 @@ The following components are needed
 3. Tool(s) that reason about whether code is in violation.
 
 Since we're using the host language directly, this is very related to the concept
-of an embedded DSL.
+of an [embedded DSL](http://c2.com/cgi/wiki?EmbeddedDomainSpecificLanguage).
 
-### Agree quasi-static
+### Agree and quasi-static checking
 
 As a particular implementation of this concept could use
 
-1. Contracts (pre/post-conditions / invariants)
+1. Contracts: pre/post-conditions & invariants
 2. Promise/function chains, exported on module-level
 Would have contracts attached, and the 'body' of the code
 be captured but not executed to prevent side-effects.
 3. ? example propagation through chain ?
-use predicate valid/examples, insert into chain
-verify that there are no cases where something passes post-conditions, then fails next precondition?
-this assumes that the pre/postconditions of a step/function is well formed
-so for full verification, the step must also be verified.
-an example which
 
+Example propagation
 
+* use predicate valid/examples, insert into chain
+* verify passing precondition,
+* generate new example(s) based on post-condition
+* feed into next step
 
-this strategy likely requires that steps are not stateful, all state must enter through function arguments
+This strategy likely requires that steps are not stateful
+(all state must enter through function arguments, exit through return/this).
+
+This assumes that the pre/postconditions of a step/function is well formed.
+So for full verification, the step must also be verified.
+This could be done through unit testing, local static or dynamic analysis.
+
+If the step is marked as side-effect free (maybe it should be opt-out?),
+then we could automatically create unit-tests which ensure that none of
+valid pre-condition examples cause post-conditions to fail.
+
+Input data normally used in (unit/behaviour) tests could be good real-life
+examples for predicates. Ideally one could declare them one place,
+and would be able to act in both capabilities.
+
+## Fault injection
+
+Since we know the preconditions, and have examples which
+
+For instance in a msgflo-noflo scenario:
+* Agree is used for/inside a NoFlo component
+* NoFlo component is used in a (possibly multi-level) NoFlo graph
+* The NoFlo graph is exposed as a MsgFlo participant on AMQP
+
+We can pick out functions with Agree contracts at lowest level,
+cause a fault there, and then have a test that ensures that
+this causes an error to be bubbled all the way up to AMQP.
+
+Can be seen as a kind of [mutation testing](https://en.wikipedia.org/wiki/Mutation_testing),
+but where we can make stronger inferences because we know more about
+the structure and semantics of the program.
 
 ## Related
 
