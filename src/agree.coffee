@@ -67,6 +67,8 @@
 agree = {}
 
 introspection = require './introspection'
+common = require './common'
+agree.getContract = common.getContract
 
 # Framework
 class ContractFailed extends Error
@@ -93,7 +95,7 @@ agree.PostconditionFailed = PostconditionFailed
 agree.ClassInvariantViolated = ClassInvariantViolated
 
 runInvariants = (invariants, instance, args) ->
-    return [] if not instance.contract? # XXX: is this a programming error?
+    return [] if not agree.getContract(instance)? # XXX: is this a programming error?
     results = []
     for invariant in invariants
         results.push
@@ -109,7 +111,6 @@ runConditions = (conditions, instance, args) ->
             condition: cond
     return results
 
-# FIXME: namespace the .contract backref, should be something like _agreeContract, to avoid collisions
 class FunctionContract
     constructor: (@name, @parent, @options) ->
         @name = 'anonymous function' if not @name
@@ -123,7 +124,7 @@ class FunctionContract
             @call instance, args
         @func = () ->
             call this, arguments
-        @func.contract = this # back-reference for introspection
+        @func._agreeContract = this # back-reference for introspection
         @func.toString = () -> return introspection.describe this
 
         defaultOptions =
@@ -175,7 +176,8 @@ class FunctionContract
 
     # Executing
     call: (instance, args) ->
-        invariants = if instance.contract? then instance.contract.invariants else []
+        contract = agree.getContract instance
+        invariants = if contract? then contract.invariants else []
         argsArray = Array.prototype.slice.call args
 
         # preconditions
@@ -234,9 +236,9 @@ class ClassContract
             @construct instance, args
         @klass = () ->
             this.toString = () -> return introspection.describe this
-            this.contract = self # back-reference for introspection
+            this._agreeContract = self # back-reference for introspection
             construct this, arguments
-        @klass.contract = this # back-reference for introspection
+        @klass._agreeContract = this # back-reference for introspection
         @klass.toString = () -> return introspection.describe this
 
         defaultOptions =
@@ -274,7 +276,7 @@ class ClassContract
         # Check class invariants
         # FIXME: share this code with FunctionContract.runInvariants
         if @options.checkClassInvariants
-            for invariant in instance.contract?.invariants
+            for invariant in agree.getContract(instance)?.invariants
                 throw new ClassInvariantViolated if not invariant.apply instance
         return instance
 
@@ -291,4 +293,3 @@ agree.Class = (name) ->
     return new ClassContract name
 
 module.exports = agree
-

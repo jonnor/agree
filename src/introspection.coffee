@@ -1,5 +1,5 @@
 
-agree = require '../'
+common = require './common'
 
 # TODO: add ability to describe objects as HTML
 # MAYBE: let console/string describe just render the HTML with super simple style
@@ -11,7 +11,7 @@ nl = "\n"
 ind = "  "
 
 tryDescribeFunction = (thing, prefix) ->
-    contract = thing.contract
+    contract = common.getContract thing
     return null if not contract
     return null if contract.constructor.name != 'FunctionContract'
 
@@ -39,7 +39,7 @@ tryDescribeFunction = (thing, prefix) ->
     return output
 
 tryDescribeClass = (thing, prefix) ->
-    contract = thing.contract
+    contract = common.getContract thing
     return null if not contract
     return null if contract.constructor.name != 'ClassContract'
 
@@ -57,8 +57,8 @@ tryDescribeClass = (thing, prefix) ->
 
 # Return information
 exports.describe = (thing) ->
-    return "No contract" if not thing.contract?
-    contract = thing.contract
+    contract = common.getContract thing
+    return "No contract" if not contract?
 
     output = tryDescribeFunction thing, ""
     return output if output
@@ -74,14 +74,15 @@ exports.describe = (thing) ->
 class Observer
     constructor: (@thing) ->
         @reset()
+        @contract = common.getContract @thing
 
-        if @thing.contract
-            @thing.contract.observe (event, data) =>
+        if @contract
+            @contract.observe (event, data) =>
                 @onEvent event, data
 
     reset: () ->
         @events = []
-        @thing.contract.observe null if @thing.contract
+        @contract.observe null if @contract
 
     onEvent: (eventName, payload) ->
         @events.push

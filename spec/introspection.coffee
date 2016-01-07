@@ -6,10 +6,11 @@ examples = require './examples'
 describe 'Introspection', ->
 
     describe 'a function', () ->
+        contract = agree.getContract examples.multiplyByTwo
         it 'knows its Contract', ->
-            chai.expect(examples.multiplyByTwo.contract).to.be.instanceof agree.FunctionContract
+            chai.expect(contract).to.be.instanceof agree.FunctionContract
         it 'has a name', ->
-            chai.expect(examples.multiplyByTwo.contract.name).to.equal 'multiplyByTwo'
+            chai.expect(contract.name).to.equal 'multiplyByTwo'
         it 'has .toString() description', ->
             desc = examples.multiplyByTwo.toString()
             chai.expect(desc).to.contain 'multiplyByTwo'
@@ -19,13 +20,14 @@ describe 'Introspection', ->
             chai.expect(desc).to.contain 'function'
     describe 'a method', () ->
         instance = new examples.Initable
+        contract = agree.getContract instance.dontcallme
         it 'knows its Contract', ->
-            chai.expect(instance.dontcallme.contract).to.be.instanceof agree.FunctionContract
+            chai.expect(contract).to.be.instanceof agree.FunctionContract
         it 'has a name', ->
-            chai.expect(instance.dontcallme.contract.name).to.equal 'Initable.dontcallme'
+            chai.expect(contract.name).to.equal 'Initable.dontcallme'
         it 'knows the Contract of its class', ->
-            chai.expect(instance.dontcallme.contract.parent).to.be.instanceof agree.ClassContract
-            chai.expect(instance.dontcallme.contract.parent.name).to.equal 'Initable'
+            chai.expect(contract.parent).to.be.instanceof agree.ClassContract
+            chai.expect(contract.parent.name).to.equal 'Initable'
         it 'has .toString() description', ->
             desc = agree.introspection.describe instance.dontcallme
             chai.expect(desc).to.contain 'method'
@@ -33,10 +35,11 @@ describe 'Introspection', ->
             chai.expect(desc).to.contain 'Initable'
             chai.expect(desc).to.contain 'body'
     describe 'a class', () ->
+        contract = agree.getContract examples.InvalidInit
         it 'knows its Contract', ->
-            chai.expect(examples.InvalidInit.contract).to.be.instanceof agree.ClassContract
+            chai.expect(contract).to.be.instanceof agree.ClassContract
         it 'has a name', ->
-            chai.expect(examples.InvalidInit.contract.name).to.equal 'InvalidInit'
+            chai.expect(contract.name).to.equal 'InvalidInit'
         it 'has .toString() description', ->
             desc = examples.Initable.toString()
             chai.expect(desc).to.contain 'class'
@@ -46,7 +49,8 @@ describe 'Introspection', ->
     describe 'a class instance', ->
         it 'knows its Contract', ->
             instance = new examples.Initable
-            chai.expect(instance.contract).to.be.instanceof agree.ClassContract
+            contract = agree.getContract instance
+            chai.expect(contract).to.be.instanceof agree.ClassContract
         it 'has .toString() description', ->
             instance = new examples.Initable
             desc = instance.toString()
@@ -55,21 +59,21 @@ describe 'Introspection', ->
             chai.expect(desc).to.contain 'method'
             chai.expect(desc).to.contain 'Initable.dontcallme'
     describe 'preconditions', ->
-        contract = examples.multiplyByTwo.contract
+        contract = agree.getContract examples.multiplyByTwo
         it 'can be enumerated', ->
             chai.expect(contract.preconditions).to.have.length 2
         it 'has description', ->
             chai.expect(contract.preconditions[0].predicate.description).to.equal 'no undefined arguments'
 
     describe 'postcondititions', ->
-        contract = examples.multiplyByTwo.contract
+        contract = agree.getContract examples.multiplyByTwo
         it 'can be enumerated', ->
             chai.expect(contract.postconditions).to.have.length 1
         it 'has description', ->
             chai.expect(contract.postconditions[0].predicate.description).to.equal 'all arguments must be numbers'
 
     describe 'class invariants', ->
-        contract = examples.InvalidInit.contract
+        contract = agree.getContract examples.InvalidInit
         it 'can be enumerated', ->
             chai.expect(contract.invariants).to.have.length 1
         it 'has description'
