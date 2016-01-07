@@ -149,8 +149,7 @@ class FunctionEvaluator
         throw new ClassInvariantViolated contract.name, failures[0].invariant if failures.length
 
         # postconditions
-        # FIXME: pass ret and not args to postconditions!!!
-        postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, args
+        postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, [ret]
         @emit 'postconditions-checked', postconditions
         failures = postconditions.filter (r) -> return not r.passed
         throw new PostconditionFailed @name, failures[0].condition if failures.length
