@@ -23,5 +23,6 @@ agree.Class 'Initable'
 .init () ->
     @prop1 = "valid"
 .method 'dontcallme'
+.body (ignor) ->
 
 
