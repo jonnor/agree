@@ -31,9 +31,10 @@ tryDescribeFunction = (thing, prefix) ->
         output += nl+prefix+ind+ind+d
 
     # body
-    if contract.bodyFunction
+    evaluator = thing._agreeEvaluator
+    if evaluator? and evaluator.bodyFunction
         output += nl+prefix+ind+'body:'
-        for line in contract.bodyFunction.toString().split '\n'
+        for line in evaluator.bodyFunction.toString().split '\n'
             output += nl+prefix+ind+ind+line
     
     return output

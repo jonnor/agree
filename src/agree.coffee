@@ -111,27 +111,90 @@ runConditions = (conditions, instance, args) ->
             condition: cond
     return results
 
+class FunctionEvaluator
+    constructor: (@bodyFunction, @options) ->
+        null
+
+    emit: (eventName, payload) ->
+        @observer eventName, payload if @observer
+    observe: (eventHandler) ->
+        @observer = eventHandler
+
+    run: (instance, args, contract) ->
+        instanceContract = agree.getContract instance
+        invariants = if instanceContract? then instanceContract.invariants else []
+        argsArray = Array.prototype.slice.call args
+
+        # preconditions
+        preconditions = if not @options.checkPrecond then [] else runConditions contract.preconditions, instance, args
+        @emit 'preconditions-checked', preconditions
+        failures = preconditions.filter (r) -> return not r.passed
+        return failures[0].condition.onFail() if failures.length
+
+        # invariants pre-check
+        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
+        @emit 'invariants-pre-checked', { invariants: invs, context: instance, arguments: argsArray }
+        failures = invs.filter (r) -> return not r.passed
+        throw new ClassInvariantViolated contract.name, failures[0].invariant if failures.length
+
+        # function body
+        @emit 'body-enter', { context: instance, arguments: argsArray }
+        ret = @bodyFunction.apply instance, args
+        @emit 'body-leave', { context: instance, arguments: argsArray, returns: ret }
+
+        # invariants post-check
+        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
+        @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
+        failures = invs.filter (r) -> return not r.passed
+        throw new ClassInvariantViolated contract.name, failures[0].invariant if failures.length
+
+        # postconditions
+        # FIXME: pass ret and not args to postconditions!!!
+        postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, args
+        @emit 'postconditions-checked', postconditions
+        failures = postconditions.filter (r) -> return not r.passed
+        throw new PostconditionFailed @name, failures[0].condition if failures.length
+
+        # success
+        return ret
+    
 class FunctionContract
-    constructor: (@name, @parent, @options) ->
+    constructor: (@name, @parent, @options = {}) ->
         @name = 'anonymous function' if not @name
         @postconditions = []
         @preconditions = []
-        @bodyFunction = () ->
-            throw new NotImplemented
-        @observer = null
 
+        # FIXME: move to concept of 'applying a contract' to a function, returning wrapped function
         call = (instance, args) =>
             @call instance, args
         @func = () ->
             call this, arguments
+        evaluator = new FunctionEvaluator null, @options
         @func._agreeContract = this # back-reference for introspection
-        @func.toString = () -> return introspection.describe this
+        @func._agreeEvaluator = evaluator # back-reference for introspection
+        @func.toString = () ->
+            return introspection.describe this
 
         defaultOptions =
             checkPrecond: true
             checkClassInvariants: true
             checkPostcond: true
-        @options = defaultOptions # FIXME: don't override
+        for k,v of defaultOptions
+            @options[k] = v if not @options[k]?
+
+    # deprecated
+    call: (instance, args) ->
+        #contract = agree.getContract instance
+        evaluator = @func._agreeEvaluator
+        evaluator.run instance, args, this
+    body: (f) ->
+        @func._agreeEvaluator.bodyFunction = f
+        return this
+    getFunction: () ->
+        return @func
+    observe: (eventHandler) ->
+        @func?._agreeEvaluator.observer = eventHandler
+
 
     ## Fluent construction
     post: () -> @postcondition.apply @, arguments
@@ -153,10 +216,6 @@ class FunctionContract
             @preconditions.push o
         return this
 
-    body: (f) ->
-        @bodyFunction = f
-        return this
-
     # Chain up to parent to continue fluent flow there
     method: () ->
         return @parent.method.apply @parent, arguments if @parent
@@ -167,57 +226,10 @@ class FunctionContract
         context[name] = @func
         return this
 
-    # Converting to normal function
+    # Up
     getClass: () ->
         return @parent?.getClass()
 
-    getFunction: () ->
-        return @func
-
-    # Executing
-    call: (instance, args) ->
-        contract = agree.getContract instance
-        invariants = if contract? then contract.invariants else []
-        argsArray = Array.prototype.slice.call args
-
-        # preconditions
-        preconditions = if not @options.checkPrecond then [] else runConditions @preconditions, instance, args
-        @emit 'preconditions-checked', preconditions
-        failures = preconditions.filter (r) -> return not r.passed
-        return failures[0].condition.onFail() if failures.length
-
-        # invariants pre-check
-        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
-        @emit 'invariants-pre-checked', { invariants: invs, context: instance, arguments: argsArray }
-        failures = invs.filter (r) -> return not r.passed        
-        throw new ClassInvariantViolated @name, failures[0].invariant if failures.length
-
-        # body
-        @emit 'body-enter', { context: instance, arguments: argsArray }
-        ret = @bodyFunction.apply instance, args
-        @emit 'body-leave', { context: instance, arguments: argsArray, returns: ret }
-
-        # invariants post-check
-        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
-        @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
-        failures = invs.filter (r) -> return not r.passed        
-        throw new ClassInvariantViolated @name, failures[0].invariant if failures.length
-
-        # postconditions
-        # FIXME: pass ret and not args to postconditions!!!
-        postconditions = if not @options.checkPostcond then [] else runConditions @postconditions, instance, args
-        @emit 'postconditions-checked', postconditions
-        failures = postconditions.filter (r) -> return not r.passed
-        throw new PostconditionFailed @name, failures[0].condition if failures.length
-
-        return ret
-
-    # Observing events
-    observe: (eventHandler) ->
-        @observer = eventHandler
-
-    emit: (eventName, payload) ->
-        @observer eventName, payload if @observer
 
 agree.FunctionContract = FunctionContract
 agree.function = (name, parent, options) ->
