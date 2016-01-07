@@ -5,11 +5,7 @@
 #    - in the chainable API, should be
 #    - see TODO in ./conditions.coffee
 # FIXME: add default error/precondfail reporting.
-#    - .error 'throws' | 'callback' ?
-# TODO: a way to declare an interface (pre,post,invar) which can be implemented by multiple function/classes
-#    - need to separate out the Contract object, and the evaluation of the contract.
-#    - one Contract should be attachable to multiple functions/classes
-#    - for observing, need to be able to find/hook up the evaluation part
+#    - .error 'throws' | 'callback' | 'return' ?
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 #
 # Later
@@ -226,6 +222,7 @@ agree.FunctionContract = FunctionContract
 agree.function = (name, parent, options, pname) ->
     return new FunctionContract name, parent, options, pname
 
+# TODO: allow ClassContract to be used as interface
 class ClassContract
     constructor: (@name, @options) ->
         @name = 'anonymous class' if not @name

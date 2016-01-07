@@ -4,6 +4,8 @@ examples = require './examples'
 
 conditions = agree.conditions
 
+# TODO: find way to avoid having to duplicate name when assigning. agree.export
+# TODO: allow to have separate name on function as contract
 agree.Class 'Foo'
 .add examples
 .init () ->
@@ -28,7 +30,7 @@ agree.Class 'Foo'
 .body (arg1, arg2) ->
     return arg1+arg2
 
-# TODO: allow to reuse/name the contract, and use different body/name
+
 .method 'setPropCorrect'
 .pre conditions.noUndefined
 .post [conditions.attributeEquals 'prop1', 'bar']
