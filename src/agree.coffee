@@ -178,10 +178,6 @@ class FunctionContract
         for k,v of defaultOptions
             @options[k] = v if not @options[k]?
 
-    # deprecated
-    observe: (eventHandler) ->
-        @func?._agreeEvaluator.observer = eventHandler
-
     # attach this Contract to an external function
     attach: (func) ->
         @func = wrapFunc this
@@ -244,7 +240,6 @@ class ClassContract
         @invariants = []
         @initializer = () ->
             # console.log 'ClassContract default initializer'
-        @observer = null
 
         self = this
         construct = (instance, args) =>
@@ -294,10 +289,6 @@ class ClassContract
             for invariant in agree.getContract(instance)?.invariants
                 throw new ClassInvariantViolated if not invariant.apply instance
         return instance
-
-    # Observing events
-    observe: (eventHandler) ->
-        @observer = eventHandler
 
     getClass: ->
         return @klass

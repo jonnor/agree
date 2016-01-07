@@ -76,14 +76,15 @@ class Observer
     constructor: (@thing) ->
         @reset()
         @contract = common.getContract @thing
+        @evaluator = @thing._agreeEvaluator 
 
-        if @contract
-            @contract.observe (event, data) =>
+        if @evaluator
+            @evaluator.observe (event, data) =>
                 @onEvent event, data
 
     reset: () ->
         @events = []
-        @contract.observe null if @contract
+        @evaluator.observe null if @evaluator
 
     onEvent: (eventName, payload) ->
         @events.push
