@@ -29,19 +29,17 @@ agree.Class 'Foo'
     return arg1+arg2
 
 # TODO: allow to reuse/name the contract, and use different body/name
-agree.function 'setPropCorrect'
+.method 'setPropCorrect'
 .pre conditions.noUndefined
 .post [conditions.attributeEquals 'prop1', 'bar']
 .body () ->
     @prop1 = 'bar'
-.add examples.Foo.prototype
 
-agree.function 'setPropWrong'
+.method 'setPropWrong'
 .precondition conditions.noUndefined
 .postcondition [conditions.attributeEquals 'prop1', 'bar']
 .body () ->
     @prop1 = 'nobar'
-.add examples.Foo.prototype
 
 describe 'FunctionContract', ->
     f = null
@@ -62,6 +60,16 @@ describe 'FunctionContract', ->
         chai.expect(() -> f.setPropWrong 1).to.throw agree.PostconditionFailed
     it 'method not violating postcondition should succeed', ->
         chai.expect(f.setPropCorrect()).to.equal "bar"
+
+    describe 'as reused interface', ->
+        c = agree.function 'shared contract'
+          .postcondition conditions.noUndefined
+        it 'function not obeying contract should fail', ->
+            fail = c.attach () -> return undefined
+            chai.expect(() -> fail true).to.throw agree.PostconditionFailed
+        it 'function obeying contract should pass', ->
+            pass = c.attach () -> return true
+            chai.expect(() -> pass true).to.not.throw
 
 describe 'precondition failure callbacks', ->
     c = null

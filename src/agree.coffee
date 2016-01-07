@@ -158,10 +158,9 @@ class FunctionEvaluator
         return ret
     
 
-wrapFunc = (self) ->
+wrapFunc = (self, evaluator) ->
     return () ->
         instance = this
-        evaluator = self.func._agreeEvaluator
         evaluator.run instance, arguments, self
 
 class FunctionContract
@@ -178,15 +177,15 @@ class FunctionContract
             @options[k] = v if not @options[k]?
 
     # attach this Contract to an external function
-    attach: (func) ->
-        @func = wrapFunc this
+    attach: (original) ->
         evaluator = new FunctionEvaluator null, @options
-        @func._agreeContract = this # back-reference for introspection
-        @func._agreeEvaluator = evaluator # back-reference for introspection
-        @func.toString = () ->
+        func = wrapFunc this, evaluator
+        func._agreeContract = this # back-reference for introspection
+        func._agreeEvaluator = evaluator # back-reference for introspection
+        func.toString = () ->
             return introspection.describe this
-        @func._agreeEvaluator.bodyFunction = func
-        return @func
+        func._agreeEvaluator.bodyFunction = original
+        return func
 
     body: (func) ->
         f = @attach func
@@ -217,12 +216,6 @@ class FunctionContract
     # Chain up to parent to continue fluent flow there
     method: () ->
         return @parent.method.apply @parent, arguments if @parent
-
-    # Register as ordinary function on @context
-    add: (context, name) ->
-        name = @name if not name?
-        context[name] = @func
-        return this
 
     # Up
     getClass: () ->
