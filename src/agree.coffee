@@ -45,17 +45,7 @@
 # Performance
 # - MAYBE: allow opt-out of postcondition and class invariant checking
 #
-# Research:
-# - Investigate how unit tests can be generated from introspected
-# invariants, or how checks can replace unit tests for simple cases
-# - Investigate to which extent invariants can be statically checked,
-# prototype reasoning about some simple cases.
-# http://coffeescript.org/documentation/docs/nodes.html
-# http://www.coffeelint.org/
-# https://github.com/jashkenas/coffeescript/issues/1466
-# - investigate composition of contracts through Promises,
-# can we reason about the chain of promises / sub-promises?
-# - investigate using a set of contract interface as an executable coding style
+# Research: See ./doc/braindump.md
 #
 # Random/ideas:
 # - Should contracts and their use be registered globally, for dependency tracking?

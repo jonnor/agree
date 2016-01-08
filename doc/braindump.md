@@ -133,6 +133,14 @@ Input data normally used in (unit/behaviour) tests could be good real-life
 examples for predicates. Ideally one could declare them one place,
 and would be able to act in both capabilities.
 
+### References
+
+* [Embedded-computing.com: Advanced static analysis meets contract-based programming]
+(http://embedded-computing.com/articles/advanced-meets-contract-based-programming/),
+explains motivation/concept of combining static analysis and contracts.
+* [Contracts as a support to static analysis of open systems]
+(http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.160.8164&rep=rep1&type=pdf)
+
 ## Predicate examples and generative testing
 
 The manually provided examples are good, and neccesary basis,
@@ -170,9 +178,76 @@ Can be seen as a kind of [mutation testing](https://en.wikipedia.org/wiki/Mutati
 but where we can make stronger inferences because we know more about
 the structure and semantics of the program.
 
+## Composition of code using contracts
+
+Ideally any standard JavaScript way of combining the functions/classes using contracts (mostly imperative)
+would give all benefits of the contracts, like static verification and test generation.
+
+However this will require very complex flow-analysis. And it may be easier if we provide also
+a library which guides or enforces best-practices, and maybe support introspection in similar
+ways as individual Agree-using functions/classes/instances do.
+
+Possible approaches include `higher-order functions`, taking the contracted functions as input.
+Typically limited to working with syncronous functions (returning results),
+but approach can also work with node.js-style call-continuation-passing (like [Async.js](https://github.com/caolan/async)).
+An as special flavor of this, may consider currying-style (like [Ramda](http://ramdajs.com/docs/)).
+
+As a lot of JavaScript code (especially in node.js, but also in browser) is async/deferred,
+Promise chains (like [bluebird](http://bluebirdjs.com) or [FlowerFlip](https://github.com/the-grid/Flowerflip))
+may be particularly interesting.
+
+Another composition techniques, include dataflow/FBP and finite state machines.
+
+## Contracts & dataflow/FBP
+
+For projects like [NoFlo](http://noflojs.org) and [MicroFlo](http://microflo.org),
+we may want to applying contracts for specifying and verifying dataflow / FBP programming.
+
+Ideally this would allow us to reason about whole (hierarchical) graphs, aided by contracts.
+
+References
+
+* [Contract-based Specification and Verification of Dataflow Programs](http://icetcs.ru.is/nwpt2015/SLIDES/JWiik_NWPT15_presentation.pdf)
+
+
+## Contracts & finite automata / FSM
+
+For projects like [finito](http://finitosm.org), we may want to apply contracts for specifying & verifying
+Finite State Machines.
+
+Ideally this would allow us to reason about whole (hierarchical) machines, aided by the contracts.
+
+References
+
+* [How to prove properties of finite state machines with cccheck]
+(http://blogs.msdn.com/b/francesco/archive/2014/09/20/how-to-prove-properties-of-finite-state-machines-with-cccheck.aspx).
+References '[lemmas](https://en.wikipedia.org/wiki/Theorem#Terminology)', a theorem-prover concept, as part of their solution.
+
+
+## Contracts as executable, provable coding style
+
+Mostly 'coding style' today is about fairly trivial things like syntax,
+including rules around naming, whitespace, blocks etc.
+These can to an extent be enforced (or normalized) using modern syntax tools.
+
+However, such tools cannot enforce things beyond syntax. For example:
+
+* Consistent error handling
+* Consistent / predictable ordering of arguments
+* Consistent handling of options
+* Completeness in functionality involving setup/teardown, back/forth, etc..
+
+Possibly this could be done by having a set of contracts,
+which all code in a library/module/class obeys?
+
 ## Related
 
+* [CodeContracts](http://research.microsoft.com/en-us/projects/contracts/), [open source](https://github.com/Microsoft/CodeContracts) contracts for .NET (C# etc).
+Has [static checking](http://research.microsoft.com/en-US/projects/contracts/cccheck.pdf) and test-generation capabilities.
+[Developer blog](http://blogs.msdn.com/b/francesco/). Interesting feature: `Assume` allows to add (missing) postconditions
+to third-party APIs.
 * [libhoare.rs](https://github.com/nrc/libhoare), contracts in Rust
+
 
 ## Thoughs by others
 
