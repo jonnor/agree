@@ -1,69 +1,10 @@
 
 
-
-Embedded devices
-----------------
-How to apply introspectable contracts to embedded devices?
-
-Challenges come from:
-
-* Poor first-class function support in popular languages like C/C++
-* contrained CPU resources of the target devices
-* difficulty of writing target-independent code/tests
-* difficulty/inconvenience of running tests on-device
-* very limited program memory, hard to store lots of introspection data
-* often not directly connected to device with the debugging UI
-
-Possible approaches
-
-* Using macros in C/C++. Would both insert pre/post/invart checking code,
-and act as markers for tool to build the contract instrospection data.
-* Use custom clang/LLVM to compile C/C++, transparently inserting checking code.
-Would output contract introspection data.
-* Use a modern language with compiler hooks. Maybe Rust?
-* DSL...
-
-
-Cross-language
---------------
-
-Useful when doing polyglot programming,
-to be able to model things in the same way.
-
-Most beneficial if one can share tools between different languages:
-for documentation, testing, debugging.
-
-Serialize contract to standard .json representation?
-All tools operate on this?
-
-
-Tools wishlist
--------------------
-
-Debugging (in-situ and retroactive)
-
-* Ability to compare multiple different runs,
-looking at differences in input/output/conditions
-* Ability to see all contracts in
-* Ability to see relationships between contracts,
-including same-level and hierarchies
-
-Testing/QA
-
-* Ability to know code test coverage,
-including verification exhaustiveness
-* Ability to calculate complexity
-
-Documentation
-
-* Integration with HTTP api docs tools,
-like [Blueprint](https://apiblueprint.org/)
-
-## Quasi-static checking
+# Quasi-static checking
 
 > An approach to static verification in dynamic languages
 
-### Background
+## Background
 
 [Static analysis](https://en.wikipedia.org/wiki/Static_program_analysis)
 and verification is done at 'compile time', by a compiler or a static analysis tool.
@@ -85,7 +26,7 @@ Another verification technique is [dynamic analysis](https://en.wikipedia.org/wi
 which is done at run-time and with all real-life/external/side effects of the program also being caused,
 and requring to trigger all the relevant code paths for good coverage.
 
-### Concept
+## Concept
 
 Quasi-static verification is a mix: We execute code (dynamic analysis),
 instead of using a compiler/parser. However, the code is written in a way that
@@ -101,7 +42,7 @@ The following components are needed
 Since we're using the host language directly, this is very related to the concept
 of an [embedded DSL](http://c2.com/cgi/wiki?EmbeddedDomainSpecificLanguage).
 
-### Agree and quasi-static checking
+## Agree and quasi-static checking
 
 As a particular implementation of this concept could use
 
@@ -133,7 +74,7 @@ Input data normally used in (unit/behaviour) tests could be good real-life
 examples for predicates. Ideally one could declare them one place,
 and would be able to act in both capabilities.
 
-### References
+## References
 
 * [Embedded-computing.com: Advanced static analysis meets contract-based programming]
 (http://embedded-computing.com/articles/advanced-meets-contract-based-programming/),
@@ -141,7 +82,7 @@ explains motivation/concept of combining static analysis and contracts.
 * [Contracts as a support to static analysis of open systems]
 (http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.160.8164&rep=rep1&type=pdf)
 
-## Predicate examples and generative testing
+# Predicate examples and generative testing
 
 The manually provided examples are good, and neccesary basis,
 for being able to generate testcases and to reason about.
@@ -149,9 +90,9 @@ for being able to generate testcases and to reason about.
 However, it is easy to miss some cases this way. Or put alternatively,
 it is unreasonably tedious to ensure (up front) that this covers everything.
 
-TODO: move fuzz/mutation tools from poly-test out to a dedicated library, that Agree can use?
+    TODO: move fuzz/mutation tools from poly-test out to a dedicated library, that Agree can use?
 
-If doing this well, hopefully get to the point where primarily doing 'automated-testing-by-example'.
+If doing this well, hopefully get to the point where primarily doing `automated-testing-by-example`.
 That is, instead of: setting up a testing framework, writing testcases in imperative code,
 somewhere else than the code-under-test, one:
 - writes code in a way that describes what is valid & not
@@ -160,7 +101,7 @@ somewhere else than the code-under-test, one:
 - a whole set of testcases is created automatically
 - they can be found & ran without any further setup
 
-## Fault injection
+# Fault injection
 
 Since we know the preconditions, and have in/valid examples, we can use these as basis for
 [fault injection](https://en.wikipedia.org/wiki/Fault_injection).
@@ -178,7 +119,7 @@ Can be seen as a kind of [mutation testing](https://en.wikipedia.org/wiki/Mutati
 but where we can make stronger inferences because we know more about
 the structure and semantics of the program.
 
-## Composition of code using contracts
+# Composition of code using contracts
 
 Ideally any standard JavaScript way of combining the functions/classes using contracts (mostly imperative)
 would give all benefits of the contracts, like static verification and test generation.
@@ -198,7 +139,7 @@ may be particularly interesting.
 
 Another composition techniques, include dataflow/FBP and finite state machines.
 
-## Contracts & dataflow/FBP
+# Contracts & dataflow/FBP
 
 For projects like [NoFlo](http://noflojs.org) and [MicroFlo](http://microflo.org),
 we may want to applying contracts for specifying and verifying dataflow / FBP programming.
@@ -210,7 +151,7 @@ References
 * [Contract-based Specification and Verification of Dataflow Programs](http://icetcs.ru.is/nwpt2015/SLIDES/JWiik_NWPT15_presentation.pdf)
 
 
-## Contracts & finite automata / FSM
+# Contracts & finite automata / FSM
 
 For projects like [finito](http://finitosm.org), we may want to apply contracts for specifying & verifying
 Finite State Machines.
@@ -224,9 +165,9 @@ References
 References '[lemmas](https://en.wikipedia.org/wiki/Theorem#Terminology)', a theorem-prover concept, as part of their solution.
 
 
-## Contracts as executable, provable coding style
+# Contracts as executable, provable coding style
 
-Mostly 'coding style' today is about fairly trivial things like syntax,
+Mostly `coding style` today is about fairly trivial things like syntax,
 including rules around naming, whitespace, blocks etc.
 These can to an extent be enforced (or normalized) using modern syntax tools.
 
@@ -240,7 +181,62 @@ However, such tools cannot enforce things beyond syntax. For example:
 Possibly this could be done by having a set of contracts,
 which all code in a library/module/class obeys?
 
-## Related
+# Embedded devices
+How to apply introspectable contracts to embedded devices?
+
+Challenges come from:
+
+* Poor first-class function support in popular languages like C/C++
+* contrained CPU resources of the target devices
+* difficulty of writing target-independent code/tests
+* difficulty/inconvenience of running tests on-device
+* very limited program memory, hard to store lots of introspection data
+* often not directly connected to device with the debugging UI
+
+Possible approaches
+
+* Using macros in C/C++. Would both insert pre/post/invart checking code,
+and act as markers for tool to build the contract instrospection data.
+* Use custom clang/LLVM to compile C/C++, transparently inserting checking code.
+Would output contract introspection data.
+* Use a modern language with compiler hooks. Maybe Rust?
+* DSL...
+
+
+# Cross-language
+
+Useful when doing polyglot programming,
+to be able to model things in the same way.
+
+Most beneficial if one can share tools between different languages:
+for documentation, testing, debugging.
+
+Serialize contract to standard .json representation?
+All tools operate on this?
+
+
+# Tools wishlist
+
+Debugging (in-situ and retroactive)
+
+* Ability to compare multiple different runs,
+looking at differences in input/output/conditions
+* Ability to see all contracts in
+* Ability to see relationships between contracts,
+including same-level and hierarchies
+
+Testing/QA
+
+* Ability to know code test coverage,
+including verification exhaustiveness
+* Ability to calculate complexity
+
+Documentation
+
+* Integration with HTTP api docs tools,
+like [Blueprint](https://apiblueprint.org/)
+
+# Related
 
 * [CodeContracts](http://research.microsoft.com/en-us/projects/contracts/), [open source](https://github.com/Microsoft/CodeContracts) contracts for .NET (C# etc).
 Has [static checking](http://research.microsoft.com/en-US/projects/contracts/cccheck.pdf) and test-generation capabilities.
@@ -249,7 +245,7 @@ to third-party APIs.
 * [libhoare.rs](https://github.com/nrc/libhoare), contracts in Rust
 
 
-## Thoughs by others
+# Thoughs by others
 
 > For a multi paradigm language to derive benefits from functional programming,
 > it should allow developers to explicitly write guarantees that can be enforced at compile time.
