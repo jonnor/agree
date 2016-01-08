@@ -82,6 +82,27 @@ explains motivation/concept of combining static analysis and contracts.
 * [Contracts as a support to static analysis of open systems]
 (http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.160.8164&rep=rep1&type=pdf)
 
+# Relation to theorem provers
+
+Many existing static verification tools translate contracts into a
+[SMT problem](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), using a standard solvers to.
+Some of these solver are again based on translating the problem into a
+[SAT problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem),
+though these are often unefficient when applied to software verification.
+
+(possibly) JavaScript-friendly solvers
+
+* [Boolector, compiled to JS](https://github.com/jgalenson/research.js/tree/master/boolector)
+* [MiniSAT, compiled to JS](http://www.msoos.org/2013/09/minisat-in-your-browser/)
+* [STP, compiled to JS](https://github.com/stp/stp/issues/191) (seemingly built on MiniSAT)
+* [Z3](https://github.com/Z3Prover/z3), could probably be compiled to JS with Emscripten
+* [CVC4](https://github.com/CVC4/CVC4), could probably be compiled to JS with Emscripten
+
+Verification languages
+
+* [Boogie](https://github.com/boogie-org/boogie), intermediate verification language, used for C# etc.
+
+
 # Predicate examples and generative testing
 
 The manually provided examples are good, and neccesary basis,
@@ -124,9 +145,14 @@ the structure and semantics of the program.
 Ideally any standard JavaScript way of combining the functions/classes using contracts (mostly imperative)
 would give all benefits of the contracts, like static verification and test generation.
 
-However this will require very complex flow-analysis. And it may be easier if we provide also
+However this will require very complex [flow-analysis](https://en.wikipedia.org/wiki/Data-flow_analysis),
+to determine how values travel through a program, and which values it may take on.
+For a dynamic language like JavaScript, the latter is especially hard.
+
+It may be easier if we provide also
 a library which guides or enforces best-practices, and maybe support introspection in similar
-ways as individual Agree-using functions/classes/instances do.
+ways as individual Agree-using functions/classes/instances do. That way, we may be able
+to provide the same information
 
 Possible approaches include `higher-order functions`, taking the contracted functions as input.
 Typically limited to working with syncronous functions (returning results),
@@ -137,7 +163,7 @@ As a lot of JavaScript code (especially in node.js, but also in browser) is asyn
 Promise chains (like [bluebird](http://bluebirdjs.com) or [FlowerFlip](https://github.com/the-grid/Flowerflip))
 may be particularly interesting.
 
-Another composition techniques, include dataflow/FBP and finite state machines.
+Another composition techniques, include dataflow/FBP and finite state machines (see separate sections).
 
 # Contracts & dataflow/FBP
 
@@ -148,7 +174,10 @@ Ideally this would allow us to reason about whole (hierarchical) graphs, aided b
 
 References
 
-* [Contract-based Specification and Verification of Dataflow Programs](http://icetcs.ru.is/nwpt2015/SLIDES/JWiik_NWPT15_presentation.pdf)
+* [Contract-based Specification and Verification of Dataflow Programs](http://icetcs.ru.is/nwpt2015/SLIDES/JWiik_NWPT15_presentation.pdf).
+Defines concept of `network invariants` and `channel invariants`, and verification strategy both for
+individual actors (components) and for networks. "To make the approach usable in practice, channel invariants
+should be inferred automatically whenever possible" cited as future work.
 
 
 # Contracts & finite automata / FSM
@@ -238,12 +267,27 @@ like [Blueprint](https://apiblueprint.org/)
 
 # Related
 
+Design-with-contracts / contracts-programming
+
 * [CodeContracts](http://research.microsoft.com/en-us/projects/contracts/), [open source](https://github.com/Microsoft/CodeContracts) contracts for .NET (C# etc).
 Has [static checking](http://research.microsoft.com/en-US/projects/contracts/cccheck.pdf) and test-generation capabilities.
 [Developer blog](http://blogs.msdn.com/b/francesco/). Interesting feature: `Assume` allows to add (missing) postconditions
 to third-party APIs.
 * [libhoare.rs](https://github.com/nrc/libhoare), contracts in Rust
+* [OpenJML/Java Modelling Language](http://jmlspecs.sourceforge.net/),
+combines contracts with [Larch](http://www.eecs.ucf.edu/~leavens/larch-faq.html).
+[Design by Contract with JML](http://www.eecs.ucf.edu/~leavens/JML//jmldbc.pdf). [Wikipedia](https://en.wikipedia.org/wiki/Java_Modeling_Language)
 
+JavaScript verification approaches
+
+* [Towards JavaScript Verification with the Dijkstra State Monad](http://research.microsoft.com/en-us/um/people/nswamy/papers/js2fs-dijkstra.pdf)
+* [Dependent Types for JavaScript](http://goto.ucsd.edu/~ravi/research/oopsla12-djs.pdf)
+* [SymJS: Automatic Symbolic Testing of JavaScript Web Applications](http://www.cs.utah.edu/~ligd/publications/SymJS-FSE14.pdf)
+
+# Ideas
+
+* Online integrated editor, allows to write JS w/Agree, automatically run check/test/doc tools.
+Can one build it on one of the code-sharing sites?
 
 # Thoughs by others
 
