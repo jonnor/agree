@@ -231,7 +231,7 @@ agree.function = (name, parent, options, pname) ->
 
 # TODO: allow ClassContract to be used as interface
 class ClassContract
-    constructor: (@name, @options) ->
+    constructor: (@name, @options = {}) ->
         @name = 'anonymous class' if not @name
         @invariants = []
         @initializer = () ->
