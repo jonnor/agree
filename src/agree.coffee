@@ -8,6 +8,13 @@
 #    - .error 'throws' | 'callback' | 'return' ?
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 #
+# API
+#
+# - functions and classes/objects have-a (set of) contract(s)
+# - contracts should be declarable as an entity, and then later, associated with zero or more functions/classes
+# - as a convenience, should be possible to declare the contract for function/class 'inline'
+# - MAYBE: have a way to create contracts/functions which inherit others
+#
 # Later
 #
 # TODO: allow to compose Contracts and/or have multiple on one function/class
@@ -244,7 +251,8 @@ class ClassContract
             checkPrecond: true
             checkClassInvariants: true
             checkPostcond: true
-        @options = defaultOptions # FIXME: don't override
+        for k, v of defaultOptions
+            @options[k] = v if not @options[k]?
 
     # add a method
     method: (name, opts) ->
