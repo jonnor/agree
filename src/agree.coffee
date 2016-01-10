@@ -92,7 +92,7 @@ runInvariants = (invariants, instance, args) ->
     results = []
     for invariant in invariants
         results.push
-            passed: invariant.apply instance
+            error: invariant.condition.check.apply instance
             invariant: invariant
     return results
 
@@ -100,7 +100,7 @@ runConditions = (conditions, instance, args) ->
     results = []
     for cond in conditions
         results.push
-            passed: cond.predicate.apply instance, args
+            error: cond.condition.check.apply instance, args
             condition: cond
     return results
 
@@ -121,14 +121,14 @@ class FunctionEvaluator
         # preconditions
         preconditions = if not @options.checkPrecond then [] else runConditions contract.preconditions, instance, args
         @emit 'preconditions-checked', preconditions
-        failures = preconditions.filter (r) -> return not r.passed
+        failures = preconditions.filter (r) -> return r.error?
         return failures[0].condition.onFail() if failures.length
 
         # invariants pre-check
         invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
         @emit 'invariants-pre-checked', { invariants: invs, context: instance, arguments: argsArray }
-        failures = invs.filter (r) -> return not r.passed
-        throw new ClassInvariantViolated contract.name, failures[0].invariant if failures.length
+        failures = invs.filter (r) -> return r.error?
+        throw new ClassInvariantViolated contract.name + failures[0].error, failures[0].invariant if failures.length
 
         # function body
         @emit 'body-enter', { context: instance, arguments: argsArray }
@@ -138,18 +138,50 @@ class FunctionEvaluator
         # invariants post-check
         invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
         @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
-        failures = invs.filter (r) -> return not r.passed
-        throw new ClassInvariantViolated contract.name, failures[0].invariant if failures.length
+        failures = invs.filter (r) -> return r.error?
+        throw new ClassInvariantViolated contract.name + failures[0].error,  failures[0].invariant if failures.length
 
         # postconditions
         postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, [ret]
         @emit 'postconditions-checked', postconditions
-        failures = postconditions.filter (r) -> return not r.passed
-        throw new PostconditionFailed @name, failures[0].condition if failures.length
+        failures = postconditions.filter (r) -> return r.error?
+        throw new PostconditionFailed @name + failures[0].error, failures[0].condition if failures.length
 
         # success
         return ret
     
+
+### Condition
+# Can be used as precondition, postcondition or invariant in a FunctionContract or ClassContract
+# The predicate function @check should return an Error object on failure, or null on pass
+#
+# Functions which returns a Condition, can be used to provide a family of parametric conditions
+###
+class Condition
+    constructor: (@check, @name) ->
+        @name = 'unnamed condition' if not @name
+
+agree.Condition = Condition
+
+# ConditionInstance
+# holds a Condition, attached to a particular @parent Contract
+class ConditionInstance
+    constructor: (@condition, parent, onFail) ->
+        defaultFail = () ->
+            throw new PreconditionFailed @condition.name, parent
+        @onFail = if onFail then onFail else defaultFail
+
+        # exposed on this object for chainable API
+        parentMethods = [
+            'pre', 'precondition',
+            'post', 'postcondition',
+            'body', 'attach',
+            'method', 'getBody'
+        ]
+        for method in parentMethods
+            this[method] = () =>
+                parent[method].apply this, arguments if parent
+
 
 wrapFunc = (self, evaluator) ->
     return () ->
@@ -191,7 +223,8 @@ class FunctionContract
     postcondition: (conditions) ->
         conditions = [conditions] if not conditions.length
         for c in conditions
-            o = { predicate: c }
+            c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow name?
+            o = new ConditionInstance c, this
             @postconditions.push o
         return this
 
@@ -199,10 +232,8 @@ class FunctionContract
     precondition: (conditions, onFail) ->
         conditions = [conditions] if not conditions.length
         for c in conditions
-            defaultFail = () ->
-                throw new PreconditionFailed @name, c
-            o = { predicate: c }
-            o.onFail = if onFail then onFail else defaultFail
+            c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow name?
+            o = new ConditionInstance c, this, onFail
             @preconditions.push o
         return this
 
@@ -257,8 +288,10 @@ class ClassContract
     # add class invariant
     invariant: (conditions) ->
         conditions = [conditions] if not conditions.length
-        for cond in conditions
-            @invariants.push cond
+        for c in conditions
+            c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow description?
+            o = new ConditionInstance c, this
+            @invariants.push o
         return this
 
     # register ordinary constructor
@@ -274,7 +307,8 @@ class ClassContract
         # FIXME: share this code with FunctionContract.runInvariants
         if @options.checkClassInvariants
             for invariant in agree.getContract(instance)?.invariants
-                throw new ClassInvariantViolated if not invariant.apply instance
+                error = invariant.condition.check.apply instance
+                throw new ClassInvariantViolated "Constructor violated invariant: #{error}" if error
         return instance
 
     getClass: ->

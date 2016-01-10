@@ -16,6 +16,7 @@ describe 'Conditions', ->
             testcase = if example.valid then 'should pass' else 'should fail'
             it testcase, ->
               cond = example.create()
-              pass = cond.apply example.context(), example.args
+              error = cond.check.apply example.context(), example.args
+              pass = not error?
               chai.expect(pass).to.equal example.valid
             

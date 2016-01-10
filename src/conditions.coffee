@@ -20,13 +20,19 @@
 # Ideas:
 # IDEA: allow to generate/composte conditions out of JSON schemas
 
+agree = require './agree'
+Condition = agree.Condition
+
 conditions = {}
 
-conditions.noUndefined = () ->
+checkUndefined = () ->
+    index = 0
     for a in arguments
-        return false if not a?
-    return true
-conditions.noUndefined.description = "no undefined arguments" 
+        isA = a?
+        if not isA
+            return new Error "Argument number #{index} is undefined"
+    return null
+conditions.noUndefined = new Condition checkUndefined, 'no undefined arguments'
 
 conditions.noUndefined.examples = [
     name: 'one undefined argument'
@@ -35,26 +41,30 @@ conditions.noUndefined.examples = [
     context: () -> return null
     args: [ undefined, 2, 3 ]
 ]
-conditions.noUndefined.toJSON = () -> return this.description
 
-conditions.numbersOnly = () ->
+checkNumbers = () ->
+    index = 0
     for a in arguments
-        return false if typeof a != 'number'
-    return true
-conditions.numbersOnly.description = "all arguments must be numbers"
-conditions.numbersOnly.toJSON = () -> return this.description
+        if typeof a != 'number'
+            return new Error "Argument number #{index} is not a number"
+    return null
+conditions.numbersOnly = new Condition checkNumbers, "all arguments must be numbers"
 
-# parametric functions, returns a predicate
+# parametric functions, returns a Condition
 conditions.neverNull = (attribute) ->
-    return () ->
-        return this[attribute]?
+    p = () ->
+        return if not this[attribute]? then new Error "Attribute #{attribute} is null" else null
+    return new Condition p, "#{attribute} must not be null"
 
 conditions.attributeEquals = (attribute, value) ->
-    return () ->
-        return this[attribute] == value
+    p = () ->
+        return if this[attribute] != value then new Error "Attribute #{attribute} does not equal #{value}" else null
+    return new Condition p, "Attribute #{attribute} must equal value"
 
 conditions.attributeTypeEquals = (attribute, type) ->
-    return () ->
-        return typeof this[attribute] == type
+    p = () ->
+        actualType = typeof this[attribute]
+        return if actualType != type then new Error "typeof this.#{attribute} != #{type}: #{actualType}" else null
+    return new Condition p, "Attribute #{attribute} must be type #{type}"
 
 module.exports = conditions

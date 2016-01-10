@@ -45,8 +45,12 @@ agree.Class 'Foo'
 
 describe 'FunctionContract', ->
     f = null
-    beforeEach ->
-        f = new examples.Foo
+    beforeEach (done) ->
+        try 
+            f = new examples.Foo
+        catch e
+            null
+        done e
 
     it 'function with valid arguments should succeed', ->
         chai.expect(examples.multiplyByTwo 13).to.equal 26
