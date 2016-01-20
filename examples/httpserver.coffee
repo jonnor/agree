@@ -19,7 +19,7 @@ conditions.requestContentType = (type) ->
     err = if actual != type then new Error "Request must have Content-Type: '#{type}', got '#{actual}'" else null
     return err
 
-  return new agree.Condition check, "Request must have Content-Type '#{type}'"
+  return new agree.Condition check, "Request must have Content-Type '#{type}'", { 'content-type': type }
 
 conditions.requestSchema = (schema, options = {}) ->
   tv4 = require 'tv4'
@@ -37,7 +37,7 @@ conditions.requestSchema = (schema, options = {}) ->
       for e in result.errors
         message.push "#{e.message} for path '#{e.dataPath}'"
       return new Error message.join('\n')
-  return new agree.Condition check, "Request body must follow schema '#{schemaDescription}'", schema
+  return new agree.Condition check, "Request body must follow schema '#{schemaDescription}'", { jsonSchema: schema }
 
 conditions.responseStatus = (code) ->
   check = (req, res) ->
@@ -45,7 +45,7 @@ conditions.responseStatus = (code) ->
     err = if actual != code then new Error "Response did not have statusCode '#{code}', instead '#{actual}'" else null
     return err
 
-  c = new agree.Condition check, "Response has statusCode '#{code}'"
+  c = new agree.Condition check, "Response has statusCode '#{code}'", { 'statusCode': code }
   c.target = 'arguments'
   return c
 
@@ -55,7 +55,7 @@ conditions.responseContentType = (type) ->
     err = if actual != type then new Error "Response wrong Content-Type. Expected '#{type}', got '#{actual}'" else null
     return err
 
-  c = new agree.Condition check, "Response has Content-Type '#{type}'"
+  c = new agree.Condition check, "Response has Content-Type '#{type}'", { 'content-type': type }
   c.target = 'arguments'
   return c
 
@@ -94,9 +94,7 @@ requestFail = (i, args, failures) ->
   errors = failures.map (f) -> { condition: f.condition.condition.name, message: f.error.toString() }
   res.json { errors: errors }
 
-# TODO: add post-conditions on response headers, data (JSON schema)
 # TODO: add pre-conditions which needing a particular app state, like existance of resource created by previous call
-# FIXME: failing pre-conditions should generally return 422, not 500
 routes.getSomeData = agree.function 'GET /somedata'
 .attr 'http_method', 'GET'
 .attr 'http_path', '/somedata'
