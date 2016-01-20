@@ -21,13 +21,8 @@ conditions.requestContentType = (type) ->
 
   return new agree.Condition check, "Request must have Content-Type '#{type}'", { 'content-type': type }
 
-conditions.requestSchema = (schema, options = {}) ->
-  tv4 = require 'tv4'
-  options.allowUnknown = false if not options.allowUnknown
-  schemaDescription = schema.id
-  schemaDescription = schema if not schemaDescription?
-  check = (req, res) ->
-    data = req.body
+validateSchema = (data, schema, options) ->
+    tv4 = require 'tv4'
     result = tv4.validateMultiple data, schema, !options.allowUnknown
     #console.log 'd', data, result
     if result.valid
@@ -37,6 +32,15 @@ conditions.requestSchema = (schema, options = {}) ->
       for e in result.errors
         message.push "#{e.message} for path '#{e.dataPath}'"
       return new Error message.join('\n')
+
+conditions.requestSchema = (schema, options = {}) ->
+  options.allowUnknown = false if not options.allowUnknown
+  schemaDescription = schema.id
+  schemaDescription = schema if not schemaDescription?
+
+  check = (req, res) ->
+    return validateSchema req.body, schema, options
+
   return new agree.Condition check, "Request body must follow schema '#{schemaDescription}'", { jsonSchema: schema }
 
 conditions.responseStatus = (code) ->
@@ -63,6 +67,16 @@ checkResponseEnded = (req, res) ->
   return if not res.finished then new Error 'Response was not finished' else null
 conditions.responseEnded = new agree.Condition checkResponseEnded, "Reponse is sent"
 conditions.responseEnded.target = 'arguments'
+
+conditions.responseSchema = (schema, options = {}) ->
+  options.allowUnknown = false if not options.allowUnknown
+  schemaDescription = schema.id
+  schemaDescription = schema if not schemaDescription?
+  check = (req, res) ->
+    return validateSchema res._jsonData, schema, options
+  c = new agree.Condition check, "Response body follows schema '#{schemaDescription}'", { jsonSchema: schema }
+  c.target = 'arguments'
+  return c
 
 ## Routes, with their contracts
 routes = {}
@@ -94,6 +108,19 @@ requestFail = (i, args, failures) ->
   errors = failures.map (f) -> { condition: f.condition.condition.name, message: f.error.toString() }
   res.json { errors: errors }
 
+somedataSchema =
+  id: 'somedata.json'
+  "$schema": "http://json-schema.org/draft-04/schema"
+  title: 'Some data'
+  description: ""
+  type: 'object'
+  required: ['initial']
+  properties:
+    initial:
+      type: 'string'
+    nonexist:
+      type: 'number'
+
 # TODO: add pre-conditions which needing a particular app state, like existance of resource created by previous call
 routes.getSomeData = agree.function 'GET /somedata'
 .attr 'http_method', 'GET'
@@ -102,6 +129,7 @@ routes.getSomeData = agree.function 'GET /somedata'
 .post conditions.responseEnded
 .post conditions.responseStatus 200
 .post conditions.responseContentType 'application/json'
+.post conditions.responseSchema somedataSchema
 .attach (req, res) ->
     res.json db.somedata
 
@@ -130,11 +158,20 @@ installExpressRoutes = (app, routes) ->
     else
       console.log "WARN: Contract '#{contract.name}' missing HTTP method/path"
 
+jsonMockMiddleware = (req, res, next) ->
+  # attaches data sent with json() function
+  original = res.json
+  res.json = (obj) ->
+    res._jsonData = obj
+    original.apply res, obj
+  next()
+
 ## Setup
 express = require 'express'
 bodyparser = require 'body-parser'
 app = express()
 app.use bodyparser.json()
+app.use jsonMockMiddleware
 installExpressRoutes app, routes
 module.exports = routes # for introspection by Agree tools
 
