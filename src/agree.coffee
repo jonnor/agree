@@ -193,6 +193,7 @@ class FunctionContract
         @name = 'anonymous function' if not @name
         @postconditions = []
         @preconditions = []
+        @attributes = {}
 
         defaultOptions =
             checkPrecond: true
@@ -237,6 +238,10 @@ class FunctionContract
             @preconditions.push o
         return this
 
+    attr: (key, val) ->
+        @attributes[key] = val
+        return this
+
     # Chain up to parent to continue fluent flow there
     method: () ->
         return @parent.method.apply @parent, arguments if @parent
@@ -257,6 +262,7 @@ class ClassContract
         @invariants = []
         @initializer = () ->
             # console.log 'ClassContract default initializer'
+        @attributes = {}
 
         self = this
         construct = (instance, args) =>
@@ -292,6 +298,10 @@ class ClassContract
             c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow description?
             o = new ConditionInstance c, this
             @invariants.push o
+        return this
+
+    attr: (key, val) ->
+        @attributes[key] = val
         return this
 
     # register ordinary constructor
