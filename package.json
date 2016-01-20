@@ -23,7 +23,8 @@
     "agree-doc": "./bin/agree-doc"
   },
   "dependencies": {
-    "coffee-script": "^1.8.0"
+    "coffee-script": "^1.8.0",
+    "tv4": "^1.2.7"
   },
   "devDependencies": {
     "chai": "^1.9.1",

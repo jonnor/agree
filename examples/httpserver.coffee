@@ -16,10 +16,27 @@ conditions = {}
 conditions.requestContentType = (type) ->
   check = (req, res) ->
     actual = req.get 'Content-Type'
-    err = if actual != type then new Error "Request must have Content-Type: #{type}, got #{actual}" else null
+    err = if actual != type then new Error "Request must have Content-Type: '#{type}', got '#{actual}'" else null
     return err
 
-  return new agree.Condition check, "Request must have Content-Type #{type}"
+  return new agree.Condition check, "Request must have Content-Type '#{type}'"
+
+conditions.requestSchema = (schema, options = {}) ->
+  tv4 = require 'tv4'
+  options.allowUnknown = false if not options.allowUnknown
+  schemaDescription = schema.id
+  schemaDescription = schema if not schemaDescription?
+  check = (req, res) ->
+    result = tv4.validateMultiple req.json, schema, !options.allowUnknown
+    if result.valid
+      return null
+    else
+      message = []
+      for e in result.errors
+        console.log 'schema err', e
+        message.push "#{e.message} for path '#{e.dataPath}'"
+      return new Error message.join('\n')
+  return new agree.Condition check, "Request body must follow schema '#{schemaDescription}'"
 
 ## Routes, with their contracts
 routes = {}
@@ -27,12 +44,47 @@ routes = {}
 # TODO: add post-conditions on response headers, data (JSON schema)
 # TODO: add pre-conditions on request data, or needing a particular state
 # FIXME: failing pre-conditions should generally return 422, not 500
-routes.root = agree.function 'GET /somedata'
+routes.getSomeData = agree.function 'GET /somedata'
 .attr 'http_method', 'GET'
 .attr 'http_path', '/somedata'
 .pre conditions.requestContentType 'application/json'
 .attach (req, res) ->
     res.json db.somedata
+
+createSchema =
+  id: 'newresource.json'
+  "$schema": "http://json-schema.org/draft-04/schema"
+  title: 'Content item'
+  description: ""
+  type: 'object'
+  required: ['name', 'tags']
+  properties:
+    name:
+      type: 'string'
+    tags:
+      description: ''
+      type: 'array'
+      minItems: 0
+      uniqueItems: true
+      items:
+        type:
+          description: 'A tag'
+          example: "my favorite thing"
+          type: 'string'
+
+requestFail = (i, args, failures) ->
+  [req, res] = args
+  res.status(422)
+  errors = failures.map (f) -> { condition: f.condition.condition.name, message: f.error.toString() }
+  res.json { errors: errors }
+
+routes.createResource = agree.function 'POST /newresource'
+.attr 'http_method', 'POST'
+.attr 'http_path', '/newresource'
+.pre (conditions.requestContentType 'application/json'), requestFail
+.pre (conditions.requestSchema createSchema), requestFail
+.attach (req, res) ->
+    db.newresource = req.json
 
 ## Utilities
 # TODO: move into library?
