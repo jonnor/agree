@@ -19,6 +19,9 @@
   "engines": {
     "node": ">=0.10.0"
   },
+  "bin": {
+    "agree-doc": "./bin/agree-doc"
+  },
   "dependencies": {
     "coffee-script": "^1.8.0"
   },
