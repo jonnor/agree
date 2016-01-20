@@ -1,9 +1,6 @@
 # Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
 # Contracts core
-# FIXME: pre/postconditions should be proper objects
-#    - in the chainable API, should be
-#    - see TODO in ./conditions.coffee
 # FIXME: add default error/precondfail reporting.
 #    - .error 'throws' | 'callback' | 'return' ?
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
@@ -122,7 +119,8 @@ class FunctionEvaluator
         preconditions = if not @options.checkPrecond then [] else runConditions contract.preconditions, instance, args
         @emit 'preconditions-checked', preconditions
         failures = preconditions.filter (r) -> return r.error?
-        return failures[0].condition.onFail() if failures.length
+        # FIXME: have one preConditionsFailed function, not one per precond. Should also be constructed separately
+        return failures[0].condition.onFail instance, args, failures if failures.length
 
         # invariants pre-check
         invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
@@ -167,8 +165,10 @@ agree.Condition = Condition
 # holds a Condition, attached to a particular @parent Contract
 class ConditionInstance
     constructor: (@condition, parent, onFail) ->
-        defaultFail = () ->
-            throw new PreconditionFailed @condition.name, parent
+        defaultFail = (instance, args, failures) ->
+            errors = failures.map (f) -> f.condition.name + ' ' + f.error.toString()
+            msg =  @condition.name + ' :' + errors.join('\n')
+            throw new PreconditionFailed msg
         @onFail = if onFail then onFail else defaultFail
 
         # exposed on this object for chainable API
