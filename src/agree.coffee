@@ -163,7 +163,7 @@ class FunctionEvaluator
 # Functions which returns a Condition, can be used to provide a family of parametric conditions
 ###
 class Condition
-    constructor: (@check, @name) ->
+    constructor: (@check, @name, @details) ->
         @name = 'unnamed condition' if not @name
 
 agree.Condition = Condition
