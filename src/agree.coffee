@@ -93,11 +93,12 @@ runInvariants = (invariants, instance, args) ->
             invariant: invariant
     return results
 
-runConditions = (conditions, instance, args) ->
+runConditions = (conditions, instance, args, retvals) ->
     results = []
     for cond in conditions
+        target = if retvals? and cond.condition.target != 'arguments' then retvals else args
         results.push
-            error: cond.condition.check.apply instance, args
+            error: cond.condition.check.apply instance, target
             condition: cond
     return results
 
@@ -146,7 +147,7 @@ class FunctionEvaluator
         throw new ClassInvariantViolated contract.name + failures[0].error,  failures[0].invariant if failures.length
 
         # postconditions
-        postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, [ret]
+        postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, args, [ret]
         @emit 'postconditions-checked', postconditions
         failures = postconditions.filter (r) -> return r.error?
         throw new PostconditionFailed @name + failures[0].error, failures[0].condition if failures.length
@@ -222,10 +223,11 @@ class FunctionContract
 
     ## Fluent construction
     post: () -> @postcondition.apply @, arguments
-    postcondition: (conditions) ->
+    postcondition: (conditions, target) ->
         conditions = [conditions] if not conditions.length
         for c in conditions
             c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow name?
+            c.target = target if target?
             o = new ConditionInstance c, this
             @postconditions.push o
         return this
