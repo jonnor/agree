@@ -33,7 +33,6 @@ conditions.requestSchema = (schema, options = {}) ->
     else
       message = []
       for e in result.errors
-        console.log 'schema err', e
         message.push "#{e.message} for path '#{e.dataPath}'"
       return new Error message.join('\n')
   return new agree.Condition check, "Request body must follow schema '#{schemaDescription}'"
@@ -74,15 +73,16 @@ createSchema =
 
 requestFail = (i, args, failures) ->
   [req, res] = args
-  res.status(422)
+  res.status 422
   errors = failures.map (f) -> { condition: f.condition.condition.name, message: f.error.toString() }
   res.json { errors: errors }
 
 routes.createResource = agree.function 'POST /newresource'
 .attr 'http_method', 'POST'
 .attr 'http_path', '/newresource'
-.pre (conditions.requestContentType 'application/json'), requestFail
-.pre (conditions.requestSchema createSchema), requestFail
+.pre conditions.requestContentType 'application/json'
+.pre conditions.requestSchema createSchema
+.error requestFail
 .attach (req, res) ->
     db.newresource = req.json
 

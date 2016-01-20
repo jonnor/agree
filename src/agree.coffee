@@ -102,8 +102,15 @@ runConditions = (conditions, instance, args) ->
     return results
 
 class FunctionEvaluator
-    constructor: (@bodyFunction, @options) ->
-        null
+    constructor: (@bodyFunction, onError, @options) ->
+        defaultFail = (instance, args, failures, stage) ->
+            errors = failures.map (f) -> f.condition.name + ' ' + f.error.toString()
+            msg =  @condition.name + ' :' + errors.join('\n')
+            err = new PreconditionFailed msg
+            throw err
+        @onError = if onError then onError else defaultFail
+        # TODO: support callbacking with the error object instead of throwing
+        # TODO: also pass invariant and post-condition failures through (user-overridable) function
 
     emit: (eventName, payload) ->
         @observer eventName, payload if @observer
@@ -119,8 +126,7 @@ class FunctionEvaluator
         preconditions = if not @options.checkPrecond then [] else runConditions contract.preconditions, instance, args
         @emit 'preconditions-checked', preconditions
         failures = preconditions.filter (r) -> return r.error?
-        # FIXME: have one preConditionsFailed function, not one per precond. Should also be constructed separately
-        return failures[0].condition.onFail instance, args, failures if failures.length
+        return @onError instance, args, failures, 'preconditions' if failures.length
 
         # invariants pre-check
         invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
@@ -164,13 +170,7 @@ agree.Condition = Condition
 # ConditionInstance
 # holds a Condition, attached to a particular @parent Contract
 class ConditionInstance
-    constructor: (@condition, parent, onFail) ->
-        defaultFail = (instance, args, failures) ->
-            errors = failures.map (f) -> f.condition.name + ' ' + f.error.toString()
-            msg =  @condition.name + ' :' + errors.join('\n')
-            throw new PreconditionFailed msg
-        @onFail = if onFail then onFail else defaultFail
-
+    constructor: (@condition, parent) ->
         # exposed on this object for chainable API
         parentMethods = [
             'pre', 'precondition',
@@ -205,7 +205,7 @@ class FunctionContract
 
     # attach this Contract to an external function
     attach: (original) ->
-        evaluator = new FunctionEvaluator null, @options
+        evaluator = new FunctionEvaluator null, @onError, @options
         func = wrapFunc this, evaluator
         func._agreeContract = this # back-reference for introspection
         func._agreeEvaluator = evaluator # back-reference for introspection
@@ -231,16 +231,21 @@ class FunctionContract
         return this
 
     pre: () -> @precondition.apply @, arguments
-    precondition: (conditions, onFail) ->
+    precondition: (conditions) ->
         conditions = [conditions] if not conditions.length
         for c in conditions
             c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow name?
-            o = new ConditionInstance c, this, onFail
+            o = new ConditionInstance c, this
             @preconditions.push o
         return this
 
     attr: (key, val) ->
         @attributes[key] = val
+        return this
+
+    error: (onError) ->
+        # FIXME: should only be for FunctionEvaluator?
+        @onError = onError
         return this
 
     # Chain up to parent to continue fluent flow there

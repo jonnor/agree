@@ -79,24 +79,23 @@ describe 'FunctionContract', ->
 
 describe 'precondition failure callbacks', ->
     c = null
-    onUndefined = null
-    onNonNumber = null
+    onError = null
     PreconditionCallbacks = agree.Class 'PreconditionCallbacks'
     .method 'callMe'
-    .precondition(conditions.noUndefined, () -> onUndefined())
-    .precondition(conditions.numbersOnly, () -> onNonNumber())
+    .precondition(conditions.noUndefined)
+    .precondition(conditions.numbersOnly)
+    .error () ->
+        onError()
     .body (f) ->
         chai.expect(false).to.equal true, 'body called'
     .getClass()
     beforeEach () ->
         c = new PreconditionCallbacks
-    it 'failing first precondition should call only first callback', (done) ->
-        onNonNumber = () -> chai.expect(false).to.equal true, 'onNonNumber called'
-        onUndefined = done
+    it 'failing first precondition should call error callback once', (done) ->
+        onError = done
         c.callMe undefined
-    it 'failing second precondition should call only second callback', (done) ->
-        onUndefined = () -> chai.expect(false).to.equal true, 'onUndefined called'
-        onNonNumber = done
+    it 'failing second precondition should call error callback once', (done) ->
+        onError = done
         c.callMe "a string"
 
 describe 'ClassContract', ->
