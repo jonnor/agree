@@ -194,6 +194,7 @@ class FunctionContract
         @postconditions = []
         @preconditions = []
         @attributes = {}
+        @_agreeType = 'FunctionContract'
 
         defaultOptions =
             checkPrecond: true
@@ -263,6 +264,7 @@ class ClassContract
         @initializer = () ->
             # console.log 'ClassContract default initializer'
         @attributes = {}
+        @_agreeType = 'ClassContract'
 
         self = this
         construct = (instance, args) =>
