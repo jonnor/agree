@@ -14,12 +14,16 @@ extractDoc = (module) ->
       structured.unknown[exportName] = thing.toString()
       continue
 
-    # FIXME: differentiate out classes/ClassContracts
-    # TODO: also extract exported Conditions
     contract.options = undefined # immaterial
-    structured.functions[exportName] = {
+    if contract._agreeType == 'FunctionContract'
+      target = structured.functions
+    if contract._agreeType == 'ClassContract'
+      target = structured.functions
+    target[exportName] = {
       contract: contract
     }
+
+    # TODO: also extract exported Conditions
 
   return structured
 
@@ -29,7 +33,7 @@ renderCommandline = (doc, options) ->
     functions: Object.keys(doc.functions).length
     classes: Object.keys(doc.classes).length
     unknown: Object.keys(doc.unknown).length
-  foundSummary = "Found: #{n.functions} Agree functions, #{n.classes} Agree classes, #{n.unknown} unknown symbols\n"
+  foundSummary = "Found: #{n.functions} Agree functions, #{n.classes} Agree classes, #{n.unknown} unknown symbols"
 
   functionDoc = []
   for name, data of doc.functions
@@ -37,7 +41,19 @@ renderCommandline = (doc, options) ->
     functionDoc.push d
   functionDoc = functionDoc.join('\n')
 
-  return foundSummary + functionDoc
+  classDoc = []
+  for name, data of doc.classes
+    d = introspection.describe data.contract
+    classDoc.push d
+  classDoc = classDoc.join('\n')
+
+  str = foundSummary
+  if n.functions
+    str += '\n' + functionDoc
+  if n.classes
+    str += '\n\n' + classDoc
+
+  return str
 
 exports.main = main = () ->
   path = require 'path'
