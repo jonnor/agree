@@ -284,6 +284,11 @@ JavaScript verification approaches
 * [Dependent Types for JavaScript](http://goto.ucsd.edu/~ravi/research/oopsla12-djs.pdf)
 * [SymJS: Automatic Symbolic Testing of JavaScript Web Applications](http://www.cs.utah.edu/~ligd/publications/SymJS-FSE14.pdf)
 
+Artificial intelligence
+
+* [STRIPS](https://en.wikipedia.org/wiki/STRIPS)-style planning and answer-set programming, rely on pre- and post-conditions.
+See [Programming as planning](http://www.vpri.org/pdf/m2009001_prog_as.pdf) for a recent, integrated example.
+
 # Ideas
 
 * Online integrated editor, allows to write JS w/Agree, automatically run check/test/doc tools.
