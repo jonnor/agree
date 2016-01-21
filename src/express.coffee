@@ -45,6 +45,17 @@ conditions.responseStatus = (code) ->
   c.target = 'arguments'
   return c
 
+# TODO: treat as special case of responseHeaderMatches ?
+conditions.responseHeaderSet = (header) ->
+  check = (req, res) ->
+    actual = res._headers[header.toLowerCase()]
+    err = if not actual? then new Error "Response did not set header '#{header}'" else null
+    return err
+
+  c = new agree.Condition check, "Response has set header '#{header}'", { 'header': header }
+  c.target = 'arguments'
+  return c
+
 conditions.responseContentType = (type) ->
   check = (req, res) ->
     header = res._headers['content-type']

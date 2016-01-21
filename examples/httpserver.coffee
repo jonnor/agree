@@ -43,12 +43,14 @@ createSchema =
   properties:
     name: { type: 'string' }
     tags: { type: 'array', uniqueItems: true, items: { type: 'string' } }
-# FIXME: post-condition for setting Location header
 routes.createResource = jsonApiFunction 'POST', '/newresource'
 .pre conditions.requestSchema createSchema
 .post conditions.responseStatus 201
+.post conditions.responseHeaderSet 'Location'
 .attach (req, res) ->
-    db.newresource = req.body
+    db.newresource = [] if not db.newresource
+    db.newresource.push req.body
+    res.set 'Location', "/newresource/#{db.newresource.length}"
     res.status(201).end()
 
 ## Setup
