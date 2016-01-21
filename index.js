@@ -4,6 +4,7 @@ var agree = require('./src/agree');
 agree.conditions = require('./src/conditions');
 agree.introspection = require('./src/introspection');
 agree.doc = require('./src/doc');
+agree.testing = require('./src/testing');
 
 agree.express = require('./src/express'); // TEMP
 

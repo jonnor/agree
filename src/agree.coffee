@@ -26,15 +26,6 @@
 # Documentation
 # - TODO: allow to generate HTML API docs; including pre,post,classinvariants
 #
-# Testing
-# - TODO: allow to attach examples to a Contract, both for failing cases, and for passing.
-#   - should include the expected result information
-#   - use this to automatically create test-cases
-# - TODO: allow to verify all pre,post,classinvariants have been triggered
-# - MAYBE: allow to go over all declared
-# - MAYBE: allow to cause a contract used by a function to fail, to check error handling
-# - MAYBE: do fuzz testing, to determine input conditions that pass precondition but fails postcond?
-#
 # Debugging
 # - TODO: ability to log failing predicates, including description, location of fail, reason for fail
 # - TODO: ability to cause failing predicate to cause breakpoint using `debugger` statement

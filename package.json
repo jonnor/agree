@@ -20,7 +20,8 @@
     "node": ">=0.10.0"
   },
   "bin": {
-    "agree-doc": "./bin/agree-doc"
+    "agree-doc": "./bin/agree-doc",
+    "agree-test": "./bin/agree-test"
   },
   "dependencies": {
     "coffee-script": "^1.8.0",
