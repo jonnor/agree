@@ -179,6 +179,7 @@ class FunctionContract
         @postconditions = []
         @preconditions = []
         @attributes = {}
+        @examples = []
         @_agreeType = 'FunctionContract'
 
         defaultOptions =
@@ -231,6 +232,21 @@ class FunctionContract
         # FIXME: should only be for FunctionEvaluator?
         @onError = onError
         return this
+
+    successExample: (name, payload) ->
+        @examples.push
+            valid: true
+            name: name
+            payload: payload
+        return this
+
+    failExample: (name, payload) ->
+        @examples.push
+            valid: false
+            name: name
+            payload: payload
+        return this
+
 
     # Chain up to parent to continue fluent flow there
     method: () ->
