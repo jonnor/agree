@@ -138,7 +138,7 @@ class Tester
           if test.responseCode?
             if test.responseCode != res.statusCode
               err = new Error "Wrong response status. Expected #{test.responseCode}, got #{res.statusCode}"
-            checks.push { name: 'responseStatus', error: err} 
+            checks.push { name: 'responseStatusCode', error: err} 
           return callback null, checks
       req.on 'error', (err) ->
         console.log 'request error', err

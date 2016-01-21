@@ -39,8 +39,12 @@ runTests = (tests, callback) ->
 
   runExample = (ex, cb) ->
       #console.log 'run', test.name, ex.name
-      t.run test.thing, test.contract, ex, (err, results) ->
+      t.run test.thing, test.contract, ex, (err, checks) ->
         #console.log 'ran', test.name, ex.name, err, results
+        results =
+          test: test.name
+          example: ex.name
+          checks: checks
         cb err, results
 
   t.setup (err) ->
@@ -62,18 +66,28 @@ exports.main = main = () ->
     console.log e
 
   tests = findExampleTests module
-  runTests tests, (err, results) ->
+  runTests tests, (err, resultsarr) ->
     throw err if err
-    errors = []
-    ran = []
-    for outer in results
-      for r in outer
-        ran.push r
-        errors.push r if r.error?
 
-    console.log "Ran #{ran.length} tests"
+    errors = []
+    results = {}
+    for item in resultsarr
+      results[item.test] = {} if not results[item.test]?
+      results[item.test][item.example] = item.checks.map (c) ->
+        status = if c.error then c.error else 'PASS'
+        errors.push c.error if c.error?
+        return "#{c.name}: #{status}"
+
+    ind = '  '
+    for target, tests of results
+      console.log target
+      for ex, res of tests
+        console.log ind, ex
+        for r in res
+          console.log ind+ind, r
+
     if errors.length
-      console.log "#{errors.length} tests failed:\n", (errors.map (e) -> "#{e.name}: #{e.error}").join('\n')
+      console.log "#{errors.length} tests failed"
       process.exit 2
     else
       process.exit 0
