@@ -260,10 +260,12 @@ Testing/QA
 including verification exhaustiveness
 * Ability to calculate complexity
 
-Documentation
+## Documentation
 
 * Integration with HTTP api docs tools,
-like [Blueprint](https://apiblueprint.org/)
+like [Blueprint](https://apiblueprint.org/), with [Aglio](https://github.com/danielgtaylor/aglio).
+Alternatives include [Swagger](http://swagger.io/) (now Open API Initiative).
+[Matic](https://github.com/mattyod/matic) possibly useful for JSON Schema documentation.
 
 # Related
 
