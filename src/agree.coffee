@@ -1,7 +1,7 @@
 # Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
 # Contracts core
-# FIXME: add default error/precondfail reporting.
+# FIXME: add more flexible default error/precondfail reporting.
 #    - .error 'throws' | 'callback' | 'return' ?
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
 #

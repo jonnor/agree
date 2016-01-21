@@ -76,7 +76,8 @@ describe 'Introspection', ->
         contract = agree.getContract examples.InvalidInit
         it 'can be enumerated', ->
             chai.expect(contract.invariants).to.have.length 1
-        it 'has description'
+        it 'has description', ->
+            chai.expect(contract.invariants[0].name).to.equal 'prop1 must not be null'
 
 
 describe 'Observing a function', ->
