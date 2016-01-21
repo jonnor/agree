@@ -1,4 +1,7 @@
 
+## Documentation
+# - TODO: allow to generate HTML API docs; including pre,post,classinvariants
+
 common = require './common'
 introspection = require './introspection'
 

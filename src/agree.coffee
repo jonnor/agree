@@ -3,13 +3,24 @@
 # Contracts core
 # FIXME: add more flexible default error/precondfail reporting.
 #    - .error 'throws' | 'callback' | 'return' ?
+# FIXME: make post-condition and invariants also obey/use onError callback
 # TODO: add first-class support for Promises, wrapper for node.js type async callbacks
+#   - initially should be just for the body. Secondarily we could try to support async preconditions?
+#   - since preconditions may rely on state not available sync, one should write a wrapper which
+#   fetches all data to be asserted in preconditions, then pass it in as arguments
+#  Should work with any A+/ES6/ES2015-compatible promises
 #
-# API
+#  Open questions
+#   - when a function body errors, should we then still evaluate the post-conditions?
+#   - if we do, should we report these in onError? should we pass the body error, or not fire at all?
+#   should there be a way to indicate functions which may fail (without it being a bug)
+#
+# API considerations
 #
 # - functions and classes/objects have-a (set of) contract(s)
 # - contracts should be declarable as an entity, and then later, associated with zero or more functions/classes
 # - as a convenience, should be possible to declare the contract for function/class 'inline'
+# - but for public APIs, contracts should always be declared separately - to encourage tracking them closely
 # - MAYBE: have a way to create contracts/functions which inherit others
 #
 # Later
@@ -22,9 +33,6 @@
 # requires to defined equality operators, over some context/domain?
 # example: increment()/decrement(), init()/reset(), push()/pop()
 # MAYBE: allow to 'inherit' when replacing a function, on object or prototype
-#
-# Documentation
-# - TODO: allow to generate HTML API docs; including pre,post,classinvariants
 #
 # Debugging
 # - TODO: ability to log failing predicates, including description, location of fail, reason for fail

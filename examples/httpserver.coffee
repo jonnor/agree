@@ -10,7 +10,9 @@ tester = new agreeExpress.Tester null
 ## Simulating access to a DB or key-value store, for keeping state. SQL or no-SQL in real-life
 db = { somedata: { initial: 'Foo' } }
 routes = {} ## Routes, with their contracts
+
 # TODO: add example of pre-conditions needing a particular app state, like existance of resource created by previous call
+# TODO: add support for asyncronous functions
 
 # Shared contract setup
 jsonApiFunction = (method, path) ->
