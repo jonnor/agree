@@ -46,13 +46,14 @@ conditions.responseStatus = (code) ->
   return c
 
 # TODO: treat as special case of responseHeaderMatches ?
-conditions.responseHeaderSet = (header) ->
+conditions.responseHeaderMatches = (header, regexp) ->
   check = (req, res) ->
+    regexp = new RegExp regexp if typeof regexp == 'string'
     actual = res._headers[header.toLowerCase()]
-    err = if not actual? then new Error "Response did not set header '#{header}'" else null
+    err = if actual? and regexp.test actual then null else new Error "Response header '#{header}':'#{actual}' did not match '#{regexp}'"
     return err
 
-  c = new agree.Condition check, "Response has set header '#{header}'", { 'header': header }
+  c = new agree.Condition check, "Response header '#{header}' matches '#{regexp}'", { header: header, regexp: regexp }
   c.target = 'arguments'
   return c
 

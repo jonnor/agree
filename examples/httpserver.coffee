@@ -46,7 +46,7 @@ createSchema =
 routes.createResource = jsonApiFunction 'POST', '/newresource'
 .pre conditions.requestSchema createSchema
 .post conditions.responseStatus 201
-.post conditions.responseHeaderSet 'Location'
+.post conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
 .attach (req, res) ->
     db.newresource = [] if not db.newresource
     db.newresource.push req.body
