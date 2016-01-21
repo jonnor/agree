@@ -107,4 +107,45 @@ exports.requestFail = (i, args, failures, reason) ->
   errors = failures.map (f) -> { condition: f.condition.name, message: f.error.toString() }
   res.json { errors: errors }
 
+class Tester
+    constructor: (@app) ->
+      @port = process.env.PORT or 3334
+      @host = process.env.HOST or 'localhost'
+      @server = null
+    setup: (callback) ->
+      return @server = @app.listen @port, callback
+    teardown: (callback) ->
+      @server.close() if @server
+      return callback null
+    run: (thing, contract, example, callback) ->
+      http = require 'http'
+      method = contract.attributes.http_method
+      path = example.path or contract.attributes.http_path
+      test = example.payload
+      r =
+        host: @host
+        port: @port
+        method: method
+        path: path
+      r.headers = test.headers if test.headers?
+      req = http.request r
+      responseBody = ""
+      req.on 'response', (res) ->
+        res.on 'data', (chunk) ->
+          responseBody += chunk.toString 'utf-8'
+        res.on 'end', () ->
+          checks = []
+          if test.responseCode?
+            if test.responseCode != res.statusCode
+              err = new Error "Wrong response status. Expected #{test.responseCode}, got #{res.statusCode}"
+            checks.push { name: 'responseStatus', error: err} 
+          return callback null, checks
+      req.on 'error', (err) ->
+        console.log 'request error', err
+        return if not callback
+        callback err
+        return callback = null
+      req.end()
+exports.Tester = Tester
+
 exports.conditions = conditions
