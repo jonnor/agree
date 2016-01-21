@@ -283,11 +283,16 @@ JavaScript verification approaches
 * [Towards JavaScript Verification with the Dijkstra State Monad](http://research.microsoft.com/en-us/um/people/nswamy/papers/js2fs-dijkstra.pdf)
 * [Dependent Types for JavaScript](http://goto.ucsd.edu/~ravi/research/oopsla12-djs.pdf)
 * [SymJS: Automatic Symbolic Testing of JavaScript Web Applications](http://www.cs.utah.edu/~ligd/publications/SymJS-FSE14.pdf)
+* [Flow: static type checker for JavaScript](http://flowtype.org/). Gradual typing, manual opt-in annotations
 
 Artificial intelligence
 
 * [STRIPS](https://en.wikipedia.org/wiki/STRIPS)-style planning and answer-set programming, rely on pre- and post-conditions.
 See [Programming as planning](http://www.vpri.org/pdf/m2009001_prog_as.pdf) for a recent, integrated example.
+
+Novel verification approaches
+
+* [Effect typing, inferred types based on their (side)effects](https://research.microsoft.com/en-us/um/people/daan/madoko/doc/koka-effects-2014.html)
 
 # Ideas
 
