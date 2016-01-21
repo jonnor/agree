@@ -55,8 +55,9 @@ conditions.responseStatus = (code) ->
 
 conditions.responseContentType = (type) ->
   check = (req, res) ->
-    actual = res._headers['content-type'].split(';')[0]
-    err = if actual != type then new Error "Response wrong Content-Type. Expected '#{type}', got '#{actual}'" else null
+    header = res._headers['content-type']
+    actual = header?.split(';')[0]
+    err = if actual != type then new Error "Response has wrong Content-Type. Expected '#{type}', got '#{actual}'" else null
     return err
 
   c = new agree.Condition check, "Response has Content-Type '#{type}'", { 'content-type': type }
@@ -130,6 +131,7 @@ routes.getSomeData = agree.function 'GET /somedata'
 .post conditions.responseStatus 200
 .post conditions.responseContentType 'application/json'
 .post conditions.responseSchema somedataSchema
+.error requestFail
 .attach (req, res) ->
     res.json db.somedata
 
@@ -140,7 +142,6 @@ routes.createResource = agree.function 'POST /newresource'
 .pre conditions.requestSchema createSchema
 .post conditions.responseEnded
 .post conditions.responseStatus 201
-.post conditions.responseContentType 'application/json'
 .error requestFail
 .attach (req, res) ->
     db.newresource = req.body
@@ -163,7 +164,7 @@ jsonMockMiddleware = (req, res, next) ->
   original = res.json
   res.json = (obj) ->
     res._jsonData = obj
-    original.apply res, obj
+    original.apply res, [obj]
   next()
 
 ## Setup
