@@ -63,14 +63,14 @@ describe 'Introspection', ->
         it 'can be enumerated', ->
             chai.expect(contract.preconditions).to.have.length 2
         it 'has description', ->
-            chai.expect(contract.preconditions[0].condition.name).to.equal 'no undefined arguments'
+            chai.expect(contract.preconditions[0].name).to.equal 'no undefined arguments'
 
     describe 'postcondititions', ->
         contract = agree.getContract examples.multiplyByTwo
         it 'can be enumerated', ->
             chai.expect(contract.postconditions).to.have.length 1
         it 'has description', ->
-            chai.expect(contract.postconditions[0].condition.name).to.equal 'all arguments must be numbers'
+            chai.expect(contract.postconditions[0].name).to.equal 'all arguments must be numbers'
 
     describe 'class invariants', ->
         contract = agree.getContract examples.InvalidInit
@@ -119,12 +119,12 @@ describe 'Observing a function', ->
             events = observer.events.filter (e) -> return e.name == 'preconditions-checked'
             failing = events[0].data.filter (c) -> return c.error != null
             chai.expect(failing).to.be.length 1
-            chai.expect(failing[0].condition.condition.name).to.equal "all arguments must be numbers"
+            chai.expect(failing[0].condition.name).to.equal "all arguments must be numbers"
         it 'can get passing precondition', ->
             events = observer.events.filter (e) -> return e.name == 'preconditions-checked'
             passing = events[0].data.filter (c) -> return c.error == null
             chai.expect(passing).to.be.length 1
-            chai.expect(passing[0].condition.condition.name).to.equal "no undefined arguments"
+            chai.expect(passing[0].condition.name).to.equal "no undefined arguments"
 
     describe 'postcondition failing', ->
         it 'can be observed'

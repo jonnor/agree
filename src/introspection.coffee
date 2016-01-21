@@ -21,13 +21,13 @@ tryDescribeFunction = (thing, prefix) ->
     # precond
     output += nl+prefix+ind+'preconditions:' if contract.preconditions.length
     for cond in contract.preconditions
-        d = cond.condition.name or cond.predicate?.description or cond.description or "unknown"
+        d = cond.name or cond.check?.description or cond.description or "unknown"
         output += nl+prefix+ind+ind+d
 
     # postcond
     output += nl+prefix+ind+'postconditions:' if contract.postconditions.length
     for cond in contract.postconditions
-        d = cond.condition.name or cond.predicate?.description or cond.description or "unknown"
+        d = cond.name or cond.check?.description or cond.description or "unknown"
         output += nl+prefix+ind+ind+d
 
     # body

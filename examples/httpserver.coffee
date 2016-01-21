@@ -105,7 +105,7 @@ createSchema =
 requestFail = (i, args, failures) ->
   [req, res] = args
   res.status 422
-  errors = failures.map (f) -> { condition: f.condition.condition.name, message: f.error.toString() }
+  errors = failures.map (f) -> { condition: f.condition.name, message: f.error.toString() }
   res.json { errors: errors }
 
 somedataSchema =

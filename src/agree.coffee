@@ -89,16 +89,16 @@ runInvariants = (invariants, instance, args) ->
     results = []
     for invariant in invariants
         results.push
-            error: invariant.condition.check.apply instance
+            error: invariant.check.apply instance
             invariant: invariant
     return results
 
 runConditions = (conditions, instance, args, retvals) ->
     results = []
     for cond in conditions
-        target = if retvals? and cond.condition.target != 'arguments' then retvals else args
+        target = if retvals? and cond.target != 'arguments' then retvals else args
         results.push
-            error: cond.condition.check.apply instance, target
+            error: cond.check.apply instance, target
             condition: cond
     return results
 
@@ -106,7 +106,7 @@ class FunctionEvaluator
     constructor: (@bodyFunction, onError, @options) ->
         defaultFail = (instance, args, failures, stage) ->
             errors = failures.map (f) -> f.condition.name + ' ' + f.error.toString()
-            msg =  @condition.name + ' :' + errors.join('\n')
+            msg = errors.join('\n')
             err = new PreconditionFailed msg
             throw err
         @onError = if onError then onError else defaultFail
@@ -168,22 +168,6 @@ class Condition
 
 agree.Condition = Condition
 
-# ConditionInstance
-# holds a Condition, attached to a particular @parent Contract
-class ConditionInstance
-    constructor: (@condition, parent) ->
-        # exposed on this object for chainable API
-        parentMethods = [
-            'pre', 'precondition',
-            'post', 'postcondition',
-            'body', 'attach',
-            'method', 'getBody'
-        ]
-        for method in parentMethods
-            this[method] = () =>
-                parent[method].apply this, arguments if parent
-
-
 wrapFunc = (self, evaluator) ->
     return () ->
         instance = this
@@ -228,8 +212,7 @@ class FunctionContract
         for c in conditions
             c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow name?
             c.target = target if target?
-            o = new ConditionInstance c, this
-            @postconditions.push o
+            @postconditions.push c
         return this
 
     pre: () -> @precondition.apply @, arguments
@@ -237,8 +220,7 @@ class FunctionContract
         conditions = [conditions] if not conditions.length
         for c in conditions
             c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow name?
-            o = new ConditionInstance c, this
-            @preconditions.push o
+            @preconditions.push c
         return this
 
     attr: (key, val) ->
@@ -305,8 +287,7 @@ class ClassContract
         conditions = [conditions] if not conditions.length
         for c in conditions
             c = new Condition c, '' if typeof c == 'function' # inline predicate. TODO: allow description?
-            o = new ConditionInstance c, this
-            @invariants.push o
+            @invariants.push c
         return this
 
     attr: (key, val) ->
@@ -326,7 +307,7 @@ class ClassContract
         # FIXME: share this code with FunctionContract.runInvariants
         if @options.checkClassInvariants
             for invariant in agree.getContract(instance)?.invariants
-                error = invariant.condition.check.apply instance
+                error = invariant.check.apply instance
                 throw new ClassInvariantViolated "Constructor violated invariant: #{error}" if error
         return instance
 
