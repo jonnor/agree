@@ -7,8 +7,8 @@ agreeExpress = agree.express
 conditions = agreeExpress.conditions 
 tester = new agreeExpress.Tester null
 
-## Route contracts
-# In production, sContracts on public APIs should be kept in a separate file from implementation
+## Contracts
+# In production, Contracts on public APIs should be kept in a separate file from implementation
 contracts = {}
 # Shared contract setup
 jsonApiFunction = (method, path) ->
@@ -61,22 +61,38 @@ contracts.createResource = jsonApiFunction 'POST', '/newresource'
 
 ## Database access
 # Simulated example of DB or key-value store, for keeping state. SQL or no-SQL in real-life
-db = { somedata: { initial: 'Foo' } }
+db =
+  state:
+    somekey: { initial: 'Foo' }
+  get: (key) ->
+    return new Promise (resolve, reject) ->
+        data = db.state[key]
+        return resolve data
+  set: (key, data) ->
+    return new Promise (resolve, reject) ->
+        db.state[key] = data
+        return resolve key
+  add: (key, data) ->
+    return new Promise (resolve, reject) ->
+        db.state[key] = [] if not db.state[key]?
+        db.state[key].push data
+        sub = db.state[key].length
+        return resolve sub
 
-## Route implementations
+## Implementation
 routes = {}
 routes.getSomeData = contracts.getSomeData.attach (req, res) ->
-    return new Promise (resolve, reject) ->
-        res.json db.somedata
-        return resolve null
+  db.get 'somekey'
+  .then (data) ->
+    res.json data
+    Promise.resolve null
 
 routes.createResource = contracts.createResource.attach (req, res) ->
-    return new Promise (resolve, reject) ->
-        db.newresource = [] if not db.newresource
-        db.newresource.push req.body
-        res.set 'Location', "/newresource/#{db.newresource.length}"
-        res.status(201).end()
-        return resolve null
+  db.add 'newresource', res.body
+  .then (key) ->
+    res.set 'Location', "/newresource/#{key}"
+    res.status(201).end()
+    Promise.resolve null
 
 ## Setup
 express = require 'express'
