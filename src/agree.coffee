@@ -89,7 +89,8 @@ runInvariants = (invariants, instance, args) ->
     for invariant in invariants
         results.push
             error: invariant.check.apply instance
-            invariant: invariant
+            invariant: invariant # TODO: remove, use condition instead
+            condition: invariant
     return results
 
 runConditions = (conditions, instance, args, retvals) ->
@@ -106,8 +107,18 @@ class FunctionEvaluator
         defaultFail = (instance, args, failures, stage) ->
             errors = failures.map (f) -> f.condition.name + ' ' + f.error.toString()
             msg = errors.join('\n')
-            err = new PreconditionFailed msg
+
+            # FIXME: include standard, structured info with the Error objects
+            if stage == 'preconditions'
+                err = new PreconditionFailed msg
+            else if stage == 'invariants-pre' or stage == 'invariants-post'
+                err = new ClassInvariantViolated msg
+            else if stage == 'postconditions'
+                err = new PostconditionFailed msg
+            else
+                err = new Error "Agree.FunctionEvaluator: Unknown stage #{stage}"
             throw err
+
         @onError = if onError then onError else defaultFail
         # TODO: support callbacking with the error object instead of throwing
         # TODO: also pass invariant and post-condition failures through (user-overridable) function
@@ -132,7 +143,7 @@ class FunctionEvaluator
         invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
         @emit 'invariants-pre-checked', { invariants: invs, context: instance, arguments: argsArray }
         failures = invs.filter (r) -> return r.error?
-        throw new ClassInvariantViolated contract.name + failures[0].error, failures[0].invariant if failures.length
+        return @onError instance, args, failures, 'invariants-pre' if failures.length
 
         # function body
         @emit 'body-enter', { context: instance, arguments: argsArray }
@@ -143,13 +154,13 @@ class FunctionEvaluator
         invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
         @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
         failures = invs.filter (r) -> return r.error?
-        throw new ClassInvariantViolated contract.name + failures[0].error,  failures[0].invariant if failures.length
+        return @onError instance, args, failures, 'invariants-post' if failures.length
 
         # postconditions
         postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, args, [ret]
         @emit 'postconditions-checked', postconditions
         failures = postconditions.filter (r) -> return r.error?
-        throw new PostconditionFailed @name + failures[0].error, failures[0].condition if failures.length
+        return @onError instance, args, failures, 'postconditions' if failures.length
 
         # success
         return ret
