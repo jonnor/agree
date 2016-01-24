@@ -77,6 +77,41 @@ describe 'FunctionContract', ->
             pass = c.attach () -> return true
             chai.expect(() -> pass true).to.not.throw
 
+describe 'Contracts on function returning Promise', ->
+    bluebird = require 'bluebird'
+    Promise = bluebird
+    c = agree.function 'shared contract'
+      .postcondition conditions.noUndefined
+
+    it 'function obeying contract returns results in .then', (done) ->
+        pass = c.attach () ->
+            return new Promise (resolve) ->
+                resolve 42
+        p = pass()
+        .then (v) ->
+            return done()
+
+    it 'function erroring returns error in .catch', (done) ->
+        pass = c.attach () ->
+            return new Promise (resolve, reject) ->
+                reject new Error 'rejection hurts'
+        p = pass()
+        p.catch (e) ->
+            return done new Error 'not right error' if not e.message == 'rejection hurts'
+            return done()
+
+    it 'function not obeying post-condition should fail', (done) ->
+        func = c.attach () ->
+            return new Promise (resolve) ->
+                resolve undefined
+        p = func()
+        .then (v) ->
+            return done new Error 'did not fail'
+        .catch (err) ->
+            return new Error 'not right error' if not err.constructor.name == 'PostconditionFailed'
+            return done null
+
+
 describe 'precondition failure callbacks', ->
     c = null
     onError = null

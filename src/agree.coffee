@@ -284,7 +284,6 @@ class FunctionContract
     getClass: () ->
         return @parent?.getClass()
 
-
 agree.FunctionContract = FunctionContract
 agree.function = (name, parent, options, pname) ->
     return new FunctionContract name, parent, options, pname
