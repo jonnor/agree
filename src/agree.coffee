@@ -133,34 +133,52 @@ class FunctionEvaluator
         invariants = if instanceContract? then instanceContract.invariants else []
         argsArray = Array.prototype.slice.call args
 
-        # preconditions
-        preconditions = if not @options.checkPrecond then [] else runConditions contract.preconditions, instance, args
-        @emit 'preconditions-checked', preconditions
-        failures = preconditions.filter (r) -> return r.error?
-        return @onError instance, args, failures, 'preconditions' if failures.length
+        preChecks = () =>
+            # preconditions
+            preconditions = if not @options.checkPrecond then [] else runConditions contract.preconditions, instance, args
+            @emit 'preconditions-checked', preconditions
+            prefailures = preconditions.filter (r) -> return r.error?
+            if prefailures.length
+                erret = @onError instance, args, prefailures, 'preconditions'
+                return [true, errret]
 
-        # invariants pre-check
-        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
-        @emit 'invariants-pre-checked', { invariants: invs, context: instance, arguments: argsArray }
-        failures = invs.filter (r) -> return r.error?
-        return @onError instance, args, failures, 'invariants-pre' if failures.length
+            # invariants pre-check
+            invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
+            @emit 'invariants-pre-checked', { invariants: invs, context: instance, arguments: argsArray }
+            invprefailures = invs.filter (r) -> return r.error?
+            if invprefailures.length
+                errret = @onError instance, args, invprefailures, 'invariants-pre'
+                return [true, errret]
 
+            return [false, null]
+
+        postChecks = () =>
+            # invariants post-check
+            invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
+            @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
+            invpostfailures = invs.filter (r) -> return r.error?
+            if invpostfailures.length
+                errret = @onError instance, args, invpostfailures, 'invariants-post'
+                return [true, errret]
+
+            # postconditions
+            postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, args, [ret]
+            @emit 'postconditions-checked', postconditions
+            postfailures = postconditions.filter (r) -> return r.error?
+            if postfailures.length
+                errret = @onError instance, args, postfailures, 'postconditions'
+                return [true, erret]
+
+            return [false, null]
+
+        [stop, checkErr] = preChecks()
+        return if stop
         # function body
         @emit 'body-enter', { context: instance, arguments: argsArray }
         ret = @bodyFunction.apply instance, args
         @emit 'body-leave', { context: instance, arguments: argsArray, returns: ret }
 
-        # invariants post-check
-        invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
-        @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
-        failures = invs.filter (r) -> return r.error?
-        return @onError instance, args, failures, 'invariants-post' if failures.length
-
-        # postconditions
-        postconditions = if not @options.checkPostcond then [] else runConditions contract.postconditions, instance, args, [ret]
-        @emit 'postconditions-checked', postconditions
-        failures = postconditions.filter (r) -> return r.error?
-        return @onError instance, args, failures, 'postconditions' if failures.length
+        postChecks()
 
         # success
         return ret
