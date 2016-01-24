@@ -55,6 +55,7 @@
 
 agree = {}
 
+Promise = require 'bluebird'
 introspection = require './introspection'
 common = require './common'
 agree.getContract = common.getContract
@@ -102,6 +103,10 @@ runConditions = (conditions, instance, args, retvals) ->
             condition: cond
     return results
 
+isPromise = (obj) ->
+    p = typeof obj?.then == 'function'
+    return p
+
 class FunctionEvaluator
     constructor: (@bodyFunction, onError, @options) ->
         defaultFail = (instance, args, failures, stage) ->
@@ -124,6 +129,8 @@ class FunctionEvaluator
         # TODO: also pass invariant and post-condition failures through (user-overridable) function
 
     emit: (eventName, payload) ->
+#        payload.context = undefined
+#        console.log 'e', eventName, payload
         @observer eventName, payload if @observer
     observe: (eventHandler) ->
         @observer = eventHandler
@@ -152,7 +159,7 @@ class FunctionEvaluator
 
             return [false, null]
 
-        postChecks = () =>
+        postChecks = (ret) =>
             # invariants post-check
             invs = if not @options.checkClassInvariants then [] else runInvariants invariants, instance, args
             @emit 'invariants-post-checked', { invariants: invs, context: instance, arguments: argsArray }
@@ -171,16 +178,25 @@ class FunctionEvaluator
 
             return [false, null]
 
+        # pre-checks
         [stop, checkErr] = preChecks()
         return if stop
+
         # function body
         @emit 'body-enter', { context: instance, arguments: argsArray }
         ret = @bodyFunction.apply instance, args
         @emit 'body-leave', { context: instance, arguments: argsArray, returns: ret }
 
-        postChecks()
-
-        # success
+        # post-checks
+        if isPromise ret
+            ret = ret.then (value) ->
+                [stop, checkErr] = postChecks value
+                if stop
+                    return Promise.reject checkErr
+                else
+                    return Promise.resolve value
+        else
+            postChecks ret
         return ret
     
 
