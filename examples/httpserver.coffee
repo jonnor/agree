@@ -12,7 +12,6 @@ db = { somedata: { initial: 'Foo' } }
 routes = {} ## Routes, with their contracts
 
 # TODO: add example of pre-conditions needing a particular app state, like existance of resource created by previous call
-# TODO: add support for asyncronous functions
 
 # Shared contract setup
 jsonApiFunction = (method, path) ->
@@ -47,7 +46,9 @@ routes.getSomeData = jsonApiFunction 'GET', '/somedata'
     'Content-Type': 'text/html'
   responseCode: 422
 .attach (req, res) ->
-    res.json db.somedata
+    return new Promise (resolve, reject) ->
+        res.json db.somedata
+        return resolve null
 
 createSchema =
   id: 'newresource.json'
@@ -62,10 +63,12 @@ routes.createResource = jsonApiFunction 'POST', '/newresource'
 .post conditions.responseStatus 201
 .post conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
 .attach (req, res) ->
-    db.newresource = [] if not db.newresource
-    db.newresource.push req.body
-    res.set 'Location', "/newresource/#{db.newresource.length}"
-    res.status(201).end()
+    return new Promise (resolve, reject) ->
+        db.newresource = [] if not db.newresource
+        db.newresource.push req.body
+        res.set 'Location', "/newresource/#{db.newresource.length}"
+        res.status(201).end()
+        return resolve null
 
 ## Setup
 express = require 'express'
