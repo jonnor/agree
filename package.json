@@ -24,11 +24,11 @@
     "agree-test": "./bin/agree-test"
   },
   "dependencies": {
+    "bluebird": "^3.1.1",
     "coffee-script": "^1.8.0",
     "tv4": "^1.2.7"
   },
   "devDependencies": {
-    "bluebird": "^3.1.1",
     "body-parser": "^1.14.2",
     "chai": "^1.9.1",
     "express": "^4.13.3",
