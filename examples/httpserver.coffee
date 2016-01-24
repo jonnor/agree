@@ -7,12 +7,9 @@ agreeExpress = agree.express
 conditions = agreeExpress.conditions 
 tester = new agreeExpress.Tester null
 
-## Simulating access to a DB or key-value store, for keeping state. SQL or no-SQL in real-life
-db = { somedata: { initial: 'Foo' } }
-routes = {} ## Routes, with their contracts
-
-# TODO: add example of pre-conditions needing a particular app state, like existance of resource created by previous call
-
+## Route contracts
+# In production, sContracts on public APIs should be kept in a separate file from implementation
+contracts = {}
 # Shared contract setup
 jsonApiFunction = (method, path) ->
   agree.function "#{method.toUpperCase()} #{path}"
@@ -23,6 +20,7 @@ jsonApiFunction = (method, path) ->
   .pre conditions.requestContentType 'application/json'
   .post conditions.responseEnded
 
+
 somedataSchema =
   id: 'somedata.json'
   "$schema": "http://json-schema.org/draft-04/schema"
@@ -31,7 +29,7 @@ somedataSchema =
   properties:
     initial: { type: 'string' }
     nonexist: { type: 'number' }
-routes.getSomeData = jsonApiFunction 'GET', '/somedata'
+contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
 .post conditions.responseStatus 200
 .post conditions.responseContentType 'application/json'
 .post conditions.responseSchema somedataSchema
@@ -45,10 +43,7 @@ routes.getSomeData = jsonApiFunction 'GET', '/somedata'
   headers:
     'Content-Type': 'text/html'
   responseCode: 422
-.attach (req, res) ->
-    return new Promise (resolve, reject) ->
-        res.json db.somedata
-        return resolve null
+
 
 createSchema =
   id: 'newresource.json'
@@ -58,11 +53,24 @@ createSchema =
   properties:
     name: { type: 'string' }
     tags: { type: 'array', uniqueItems: true, items: { type: 'string' } }
-routes.createResource = jsonApiFunction 'POST', '/newresource'
+contracts.createResource = jsonApiFunction 'POST', '/newresource'
 .pre conditions.requestSchema createSchema
 .post conditions.responseStatus 201
 .post conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
-.attach (req, res) ->
+
+
+## Database access
+# Simulated example of DB or key-value store, for keeping state. SQL or no-SQL in real-life
+db = { somedata: { initial: 'Foo' } }
+
+## Route implementations
+routes = {}
+routes.getSomeData = contracts.getSomeData.attach (req, res) ->
+    return new Promise (resolve, reject) ->
+        res.json db.somedata
+        return resolve null
+
+routes.createResource = contracts.createResource.attach (req, res) ->
     return new Promise (resolve, reject) ->
         db.newresource = [] if not db.newresource
         db.newresource.push req.body
