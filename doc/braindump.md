@@ -193,7 +193,6 @@ References
 (http://blogs.msdn.com/b/francesco/archive/2014/09/20/how-to-prove-properties-of-finite-state-machines-with-cccheck.aspx).
 References '[lemmas](https://en.wikipedia.org/wiki/Theorem#Terminology)', a theorem-prover concept, as part of their solution.
 
-
 # Contracts as executable, provable coding style
 
 Mostly `coding style` today is about fairly trivial things like syntax,
@@ -209,6 +208,13 @@ However, such tools cannot enforce things beyond syntax. For example:
 
 Possibly this could be done by having a set of contracts,
 which all code in a library/module/class obeys?
+
+# Best practices with contracts
+
+For public/external APIs, contracts should be declared in an file external from the implementation.
+For instance in a file under ./constracts, then used by files in ./src (implementation) and ./test or ./spec (tests).
+This make sure that changes to publically relied-upon contracts, and get due attention during code review.
+
 
 # Embedded devices
 How to apply introspectable contracts to embedded devices?
@@ -231,6 +237,11 @@ Would output contract introspection data.
 * Use a modern language with compiler hooks. Maybe Rust?
 * DSL...
 
+## References
+
+* [C++ standard proposal: Simple contracts for C++](http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2015/n4415.pdf).
+Uses the C++11 [generalized attribute](http://www.codesynthesis.com/~boris/blog/2012/04/18/cxx11-generalized-attributes/) mechanism,
+contracts to be implemented by compilers.
 
 # Cross-language
 
