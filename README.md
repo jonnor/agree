@@ -71,3 +71,8 @@ See the tests under [./spec/](./spec) for full reference.
 
 `agree-test` can introspect modules, extract examples from contracts,
 and automatically generate and run tests from these.
+
+## License
+
+MIT, see [LICENSE.md](./LICENSE.md)
+
