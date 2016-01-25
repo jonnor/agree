@@ -4,18 +4,16 @@ try
 catch e
   agree = require 'agree' # when running as standalone example
 agreeExpress = agree.express
-conditions = agreeExpress.conditions 
-tester = new agreeExpress.Tester null
+conditions = agreeExpress.conditions
 
 ## Contracts
-# In production, Contracts on public APIs should be kept in a separate file from implementation
+# In production, Contracts for public APIs should be kept in a separate file from implementation
 contracts = {}
 # Shared contract setup
 jsonApiFunction = (method, path) ->
   agree.function "#{method.toUpperCase()} #{path}"
   .attr 'http_method', method
   .attr 'http_path', path
-  .attr 'tester', tester # XXX: experimental
   .error agreeExpress.requestFail
   .pre conditions.requestContentType 'application/json'
   .post conditions.responseEnded
@@ -23,29 +21,27 @@ jsonApiFunction = (method, path) ->
 contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
   .post conditions.responseStatus 200
   .post conditions.responseContentType 'application/json'
-  .post conditions.responseSchema
-    id: 'somedata.json'
-    "$schema": "http://json-schema.org/draft-04/schema"
+  .post conditions.responseSchema 'somedata.json',
     type: 'object'
     required: ['initial']
     properties:
       initial: { type: 'string' }
       nonexist: { type: 'number' }
-  .successExample 'correct-headers',
+  .successExample 'All headers correct',
+    _type: 'http-request-response'
     headers:
       'Content-Type': 'application/json'
     responseCode: 200
     responseBody:
       'initial': 'Foo'
-  .failExample 'wrong-content-type',
+  .failExample 'Wrong Content-Type',
+    _type: 'http-request-response'
     headers:
       'Content-Type': 'text/html'
     responseCode: 422
 
 contracts.createResource = jsonApiFunction 'POST', '/newresource'
-  .pre conditions.requestSchema
-    id: 'newresource.json'
-    '$schema': 'http://json-schema.org/draft-04/schema'
+  .pre conditions.requestSchema 'newresource.json',
     type: 'object'
     required: ['name', 'tags']
     properties:
@@ -98,7 +94,7 @@ app.use bodyparser.json()
 app.use agreeExpress.mockingMiddleware
 agreeExpress.installExpressRoutes app, routes
 module.exports = routes # for introspection by Agree tools
-tester.app = app
+agree.testing.registerTester 'http-request-response', new agreeExpress.Tester app
 
 ## Run
 main = () ->

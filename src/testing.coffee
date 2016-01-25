@@ -21,32 +21,45 @@
 
 common = require './common'
 
+exports.testers = {} # Module state
+
 findExampleTests = (module) ->
   tests = {}
 
+  # FIXME: share module walking with documentation, by putting into ./introspection
   for n, thing of module
     contract = common.getContract thing
     continue if not contract
 
-    tester = contract.attributes.tester
     examples = contract.examples
-    continue if not tester # FIXME: provide default. Or get rid of concept 
 
     tests[n] =
       name: contract.name
       thing: thing
-      tester: tester
       contract: contract
       examples: examples
   return tests
 
-runTests = (tests, callback) ->
-  # FIXME: don't assume single test/tester
+findExampleTypes = (tests) ->
+  types = []
+
+  for tn, test of tests
+    for en, example of test.examples
+      # TODO: have a default type, normalize example data to include it
+      # TODO: provide a Tester for the default, which would be just executing the function
+      type = example.payload?._type
+      if type? and types.indexOf(type) == -1
+        types.push type
+
+  return types
+
+runTests = (tester, tests, callback) ->
+  t = tester
+  #console.log 'ex', test.examples
+
+  # FIXME: don't assume a single test
   firstKey = Object.keys(tests)[0]
   test = tests[firstKey]
-  
-  t = test.tester
-  #console.log 'ex', test.examples
 
   runExample = (ex, cb) ->
       #console.log 'run', test.name, ex.name
@@ -66,6 +79,30 @@ runTests = (tests, callback) ->
         console.log 'teardown error', terr if terr
         return callback err, results
 
+renderPlainText = (resultsarr) ->
+  errors = []
+  results = {}
+  for item in resultsarr
+    results[item.test] = {} if not results[item.test]?
+    results[item.test][item.example] = item.checks.map (c) ->
+      status = if c.error then c.error else 'PASS'
+      errors.push c.error if c.error?
+      return "#{c.name}: #{status}"
+
+  lines = []
+  ind = '  '
+  for target, tests of results
+    lines.push target
+    for ex, res of tests
+      lines.push "#{ind} #{ex}"
+      for r in res
+        lines.push "#{ind+ind} #{r}"
+  str = lines.join '\n'
+  return [str, errors]
+
+exports.registerTester = (type, tester) ->
+  exports.testers[type] = tester
+
 exports.main = main = () ->
   path = require 'path'
 
@@ -75,27 +112,25 @@ exports.main = main = () ->
     module = require modulePath
   catch e
     console.log e
+    process.exit 1
 
   tests = findExampleTests module
-  runTests tests, (err, resultsarr) ->
+  types = findExampleTypes tests 
+
+  throw new Error "No tests types found: #{tests}" if not Object.keys(tests).length
+  throw new Error "No test types found: #{types}" if not types.length
+
+  throw new Error "Only one example type at a time is supported right now, found: #{types}" if types.length > 1  # FIXME: don't assume single test type
+  type = types[0]
+  tester = exports.testers[type]
+  knownTypes = Object.keys exports.testers
+  throw new Error "Could not find Tester for example type #{type}. Registered: #{knownTypes}" if not tester
+
+  runTests tester, tests, (err, results) ->
     throw err if err
 
-    errors = []
-    results = {}
-    for item in resultsarr
-      results[item.test] = {} if not results[item.test]?
-      results[item.test][item.example] = item.checks.map (c) ->
-        status = if c.error then c.error else 'PASS'
-        errors.push c.error if c.error?
-        return "#{c.name}: #{status}"
-
-    ind = '  '
-    for target, tests of results
-      console.log target
-      for ex, res of tests
-        console.log ind, ex
-        for r in res
-          console.log ind+ind, r
+    [text, errors] = renderPlainText results
+    console.log text
 
     if errors.length
       console.log "#{errors.length} tests failed"
