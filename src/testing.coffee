@@ -1,5 +1,8 @@
+# Agree - Introspectable Contracts Programming for JavaScript
+# * Copyright (c) 2016 Jon Nordby <jononor@gmail.com>
+# * Agree may be freely distributed under the MIT license
 
-# Testing
+## Testing
 # - TODO: allow to attach examples to a Contract, both for failing cases, and for passing.
 #   - should include the expected result information
 #   - use this to automatically create test-cases

@@ -1,4 +1,9 @@
-# Contracts allows specifying pre/post-conditions, class invariants on function, methods and classes.
+# Agree - Introspectable Contracts Programming for JavaScript
+# * Copyright (c) 2016 Jon Nordby <jononor@gmail.com>
+# * Agree may be freely distributed under the MIT license
+
+## Contracts
+# Allows specifying pre/post-conditions, class invariants on function, methods and classes.
 #
 # Contracts core
 # FIXME: add more flexible default error/precondfail reporting.

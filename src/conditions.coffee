@@ -1,4 +1,8 @@
-# Conditions/Predicates, can be used as class invariants, pre- or post-conditions
+# Agree - Introspectable Contracts Programming for JavaScript
+# * Copyright (c) 2016 Jon Nordby <jononor@gmail.com>
+# * Agree may be freely distributed under the MIT license
+
+## Conditions/Predicates, can be used as class invariants, pre- or post-conditions
 # Some of these can be generic and provided by framework, parametriced to 
 # tailor to particular program need.
 #

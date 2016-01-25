@@ -1,3 +1,7 @@
+# Agree - Introspectable Contracts Programming for JavaScript
+# * Copyright (c) 2016 Jon Nordby <jononor@gmail.com>
+# * Agree may be freely distributed under the MIT license
+
 ## Convenience stuff around Express.JS
 # Will eventually be moved into its own library
 
