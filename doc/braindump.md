@@ -1,3 +1,68 @@
+# Benefits of contracts
+
+Since contract programming / design-by-contracts is not a common tool/technique,
+will likely need to explain the benefits to convince someone to try it out.
+Especially relation, and differences to, (static) typing, and automated testing
+may be revealing.
+<!-- TODO: document this somewhere in project description/README -->
+
+Important to note, that contracts does not exclude (static) typing nor automated testing.
+In fact, probably best seen as complimentary. Use together, especially with automated tests!
+
+* Unlike automated tests, validates each and every execution, including in production.
+More exhaustive coverage, reducing things that slip through.
+* Can encode/enforce more info than (conventional) typing systems.
+Reaching expressitivity only available with algebraic types, dependent types and effect typing.
+Neither of these are commonly available for JavaScript right now.
+* Produces informational error messages as side-effect of verification
+* (should) Less effort spent for same verification/coverage level
+* (maybe) Allow for static reasoning of programs.
+Proved achievable for static systems, like Code Contract for .NET.
+Yet unproven for JavaScript, see section 'quasi-static analysis' for details.
+
+## Benefits of Agree approach
+
+Fact that we're applying to a highly dynamic language, that it is a library,
+and focused on introspection are probably the key elements here.
+
+Note: Not all these realized yet! Some are hypothetical, possibly even theoretical.
+
+Library
+
+* No special language features required
+* No special build or compiler required
+* Contracts are just code, can be manipulated programatically with JS
+* Can be applied to existing code without changing it (only adding)
+* Invisible to calling code, can use inside libraries/modules
+* Can be introduced gradually in codebase
+
+Introspection
+
+* Test/code-coverage
+* Documentation generation
+* Self-documenting
+* Automated test-generation
+* Self-testing
+* Tracing
+* (maybe) Quasi-static analysis
+
+
+## Limitations and Drawbacks
+
+Nothing is perfect. What are they? How to mitigate?
+
+* Requires using a/this library, must be included at runtime.
+Mitigation: few dependencies, minimize code size.
+* Wraps functions at runtime, using functions for conditions
+Mitigation: test, minimize and document performance impact.
+Provide best-practices on how to check if this is a problem, and what to do if it is.
+* Has/suggests a particular coding style
+
+# Best practices with contracts
+
+For public/external APIs, contracts should be declared in an file external from the implementation.
+For instance in a file under ./constracts, then used by files in ./src (implementation) and ./test or ./spec (tests).
+This make sure that changes to publically relied-upon contracts, and get due attention during code review.
 
 
 # Quasi-static checking
@@ -89,26 +154,6 @@ also be considered a failure (at least in stricter modes).
 explains motivation/concept of combining static analysis and contracts.
 * [Contracts as a support to static analysis of open systems]
 (http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.160.8164&rep=rep1&type=pdf)
-
-# Relation to theorem provers
-
-Many existing static verification tools translate contracts into a
-[SMT problem](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), using a standard solvers to.
-Some of these solver are again based on translating the problem into a
-[SAT problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem),
-though these are often unefficient when applied to software verification.
-
-(possibly) JavaScript-friendly solvers
-
-* [Boolector, compiled to JS](https://github.com/jgalenson/research.js/tree/master/boolector)
-* [MiniSAT, compiled to JS](http://www.msoos.org/2013/09/minisat-in-your-browser/)
-* [STP, compiled to JS](https://github.com/stp/stp/issues/191) (seemingly built on MiniSAT)
-* [Z3](https://github.com/Z3Prover/z3), could probably be compiled to JS with Emscripten
-* [CVC4](https://github.com/CVC4/CVC4), could probably be compiled to JS with Emscripten
-
-Verification languages
-
-* [Boogie](https://github.com/boogie-org/boogie), intermediate verification language, used for C# etc.
 
 
 # Predicate examples and generative testing
@@ -224,7 +269,8 @@ However, such tools cannot enforce things beyond syntax. For example:
 Possibly this could be done by having a set of contracts,
 which all code in a library/module/class obeys?
 
-# Contracts and user-interfaces
+
+# User interfaces
 
 As of Jan 2016, most thinking/testing has been on applying to web backend services or small (domain-independent) units.
 However, user interfaces, especially in browsers, is an area where JavaScript is even bigger.
@@ -238,72 +284,6 @@ In particular, application to functional/reactive styles as popularized by React
 
 For highly interactive UIs, like in games, availability of actions may depend on particular game states,
 which could also be interesting to model as contracts.
-
-# Benefits of contracts
-
-Since contract programming / design-by-contracts is not a common tool/technique,
-will likely need to explain the benefits to convince someone to try it out.
-Especially relation, and differences to, (static) typing, and automated testing
-may be revealing.
-<!-- TODO: document this somewhere in project description/README -->
-
-Important to note, that contracts does not exclude (static) typing nor automated testing.
-In fact, probably best seen as complimentary. Use together, especially with automated tests!
-
-* Unlike automated tests, validates each and every execution, including in production.
-More exhaustive coverage, reducing things that slip through.
-* Can encode/enforce more info than (conventional) typing systems.
-Reaching expressitivity only available with algebraic types, dependent types and effect typing.
-Neither of these are commonly available for JavaScript right now.
-* Produces informational error messages as side-effect of verification
-* (should) Less effort spent for same verification/coverage level
-* (maybe) Allow for static reasoning of programs.
-Proved achievable for static systems, like Code Contract for .NET.
-Yet unproven for JavaScript, see section 'quasi-static analysis' for details.
-
-## Benefits of Agree approach
-
-Fact that we're applying to a highly dynamic language, that it is a library,
-and focused on introspection are probably the key elements here.
-
-Note: Not all these realized yet! Some are hypothetical, possibly even theoretical.
-
-Library
-
-* No special language features required
-* No special build or compiler required
-* Contracts are just code, can be manipulated programatically with JS
-* Can be applied to existing code without changing it (only adding)
-* Invisible to calling code, can use inside libraries/modules
-* Can be introduced gradually in codebase
-
-Introspection
-
-* Test/code-coverage
-* Documentation generation
-* Self-documenting
-* Automated test-generation
-* Self-testing
-* Tracing
-* (maybe) Quasi-static analysis
-
-
-## Limitations and Drawbacks
-
-Nothing is perfect. What are they? How to mitigate?
-
-* Requires using a/this library, must be included at runtime.
-Mitigation: few dependencies, minimize code size.
-* Wraps functions at runtime, using functions for conditions
-Mitigation: test, minimize and document performance impact.
-Provide best-practices on how to check if this is a problem, and what to do if it is.
-* Has/suggests a particular coding style
-
-# Best practices with contracts
-
-For public/external APIs, contracts should be declared in an file external from the implementation.
-For instance in a file under ./constracts, then used by files in ./src (implementation) and ./test or ./spec (tests).
-This make sure that changes to publically relied-upon contracts, and get due attention during code review.
 
 
 # Embedded devices
@@ -344,7 +324,6 @@ for documentation, testing, debugging.
 Serialize contract to standard .json representation?
 All tools operate on this?
 
-
 # Tools wishlist
 
 Debugging (in-situ and retroactive)
@@ -367,6 +346,7 @@ including verification exhaustiveness
 like [Blueprint](https://apiblueprint.org/), with [Aglio](https://github.com/danielgtaylor/aglio).
 Alternatives include [Swagger](http://swagger.io/) (now Open API Initiative).
 [Matic](https://github.com/mattyod/matic) possibly useful for JSON Schema documentation.
+
 
 # Related
 
@@ -396,6 +376,26 @@ See [Programming as planning](http://www.vpri.org/pdf/m2009001_prog_as.pdf) for 
 Novel verification approaches
 
 * [Effect typing, inferred types based on their (side)effects](https://research.microsoft.com/en-us/um/people/daan/madoko/doc/koka-effects-2014.html)
+
+## Relation to theorem provers
+
+Many existing static verification tools translate contracts into a
+[SMT problem](https://en.wikipedia.org/wiki/Satisfiability_modulo_theories), using a standard solvers to.
+Some of these solver are again based on translating the problem into a
+[SAT problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem),
+though these are often unefficient when applied to software verification.
+
+(possibly) JavaScript-friendly solvers
+
+* [Boolector, compiled to JS](https://github.com/jgalenson/research.js/tree/master/boolector)
+* [MiniSAT, compiled to JS](http://www.msoos.org/2013/09/minisat-in-your-browser/)
+* [STP, compiled to JS](https://github.com/stp/stp/issues/191) (seemingly built on MiniSAT)
+* [Z3](https://github.com/Z3Prover/z3), could probably be compiled to JS with Emscripten
+* [CVC4](https://github.com/CVC4/CVC4), could probably be compiled to JS with Emscripten
+
+Verification languages
+
+* [Boogie](https://github.com/boogie-org/boogie), intermediate verification language, used for C# etc.
 
 # Ideas
 
