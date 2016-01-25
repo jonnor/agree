@@ -1,7 +1,7 @@
 
-# Agree: Introspectable Contracts programming for JavaScript/CoffeeScript
+# Agree: Contract programming for JavaScript
 
-Agree is a library for implementing
+Agree is a library for implementing Contract Programming / 
 [Design by contract](http://en.wikipedia.org/wiki/Design_by_contract) in JavaScript,
 including `preconditions`, `postconditions` and `class invariants`.
 
@@ -14,7 +14,7 @@ Functions, classes and instances built with Agree know their associated contract
 This allows to query the code about its properties, to generate documentation,
 test-cases and aid in debugging of failures.
 
-Agree is partially related other work by author on introspectable programming,
+Agree is partially related other work by [author](http://jonnor.com) on introspectable programming,
 including [Finito](http://finitosm.org) (finite state machines)
 and [NoFlo](http://noflojs.org)/[MicroFlo](http://microflo.org) (dataflow).
 
@@ -28,26 +28,36 @@ and [NoFlo](http://noflojs.org)/[MicroFlo](http://microflo.org) (dataflow).
 
 Usecases
 
-- [NoFlo](http://noflojs.org) components: verifying data on inports, specifying component behavior
 - HTTP REST apis: specifying behavior, validating request, consistent error handling
-- Abstractions: multiple implementations of same interface fully described
+- [NoFlo](http://noflojs.org) components: verifying data on inports, specifying component behavior
+- Interfaces: multiple implementations of same interface fully described
 
 ## Status
 
 **Experimental** as of January 2016.
 
-* Functions, method and simple class invariants work
-* Contracts can be used to defined interface
+* Functions, method and class invariants work
+* Support for asyncronous functions using Promise (ES6/A+ compatible)
+* Contracts can reusable, and used to define interfaces with multiple implementations
 * Some proof-of-concept documentation and testing tools exists
 * Library has not been used in any real applications yet
 
 High-level TODO:
 
-* Add async support; Promises and node.js style callbacks
-* Add more helpers for debugging/testing/documentation
+* Add more tests for core functionality
+* Do use-case exploration of a browser/frontend example
+* Remove CoffeeScript as run-time dependency
+* Setup build automated tests for browser
+* Stabilize and document the testing and documentation tools
 * Add support for more types of invariants, including on properties
 
 For details see TODO/FIXME/XXX/MAYBE comments in the code.
+
+## Installing
+
+Add Agree to your project using [NPM](http://npmjs.org)
+
+    npm install --save agree
 
 ## Examples
 
@@ -55,4 +65,9 @@ For details see TODO/FIXME/XXX/MAYBE comments in the code.
 
 See the tests under [./spec/](./spec) for full reference.
 
+## Tools
 
+`agree-doc` can introspect modules and generate plain-text documentation.
+
+`agree-test` can introspect modules, extract examples from contracts,
+and automatically generate and run tests from these.
