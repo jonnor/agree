@@ -12,6 +12,11 @@ conditions.requestContentType = (type) ->
 
   return new agree.Condition check, "Request must have Content-Type '#{type}'", { 'content-type': type }
 
+# TODO: move schema things to separate file ./schema.coffee
+# TODO: allow to infer schema from an example object
+# MAYBE: combine inferred schema, with class-invariant,
+#    to ensure all properties are declared in constructor with defaults?
+#    if used as pre-condition on other functions, basically equivalent to a traditional class type!
 validateSchema = (data, schema, options) ->
     tv4 = require 'tv4'
     result = tv4.validateMultiple data, schema, !options.allowUnknown
@@ -24,6 +29,9 @@ validateSchema = (data, schema, options) ->
         message.push "#{e.message} for path '#{e.dataPath}'"
       return new Error message.join('\n')
 
+# TODO: let take schema id as input
+# TODO: set schema url if not set
+#    '$schema': 'http://json-schema.org/draft-04/schema'
 # TODO: allow referencing named schemas
 conditions.requestSchema = (schema, options = {}) ->
   options.allowUnknown = false if not options.allowUnknown
@@ -73,6 +81,7 @@ checkResponseEnded = (req, res) ->
 conditions.responseEnded = new agree.Condition checkResponseEnded, "Reponse is sent"
 conditions.responseEnded.target = 'arguments'
 
+# TODO: take if as optional first param
 conditions.responseSchema = (schema, options = {}) ->
   options.allowUnknown = false if not options.allowUnknown
   schemaDescription = schema.id

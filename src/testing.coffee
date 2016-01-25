@@ -7,6 +7,10 @@
 # - MAYBE: allow to go over all declared
 # - MAYBE: allow to cause a contract used by a function to fail, to check error handling
 # - MAYBE: do fuzz testing, to determine input conditions that pass precondition but fails postcond?
+# - TODO: use fault injection, by removing body of each function in suite, and ensure that at least one test fails
+# - TODO: if there are 0 tests found, print error and exit
+# - FIXME: add some basic tests for testing tools...
+# - MAYBE: add a structured output format
 
 common = require './common'
 
