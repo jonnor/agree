@@ -20,43 +20,39 @@ jsonApiFunction = (method, path) ->
   .pre conditions.requestContentType 'application/json'
   .post conditions.responseEnded
 
-
-somedataSchema =
-  id: 'somedata.json'
-  "$schema": "http://json-schema.org/draft-04/schema"
-  type: 'object'
-  required: ['initial']
-  properties:
-    initial: { type: 'string' }
-    nonexist: { type: 'number' }
 contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
-.post conditions.responseStatus 200
-.post conditions.responseContentType 'application/json'
-.post conditions.responseSchema somedataSchema
-.successExample 'correct-headers',
-  headers:
-    'Content-Type': 'application/json'
-  responseCode: 200
-  responseBody:
-    'initial': 'Foo'
-.failExample 'wrong-content-type',
-  headers:
-    'Content-Type': 'text/html'
-  responseCode: 422
+  .post conditions.responseStatus 200
+  .post conditions.responseContentType 'application/json'
+  .post conditions.responseSchema
+    id: 'somedata.json'
+    "$schema": "http://json-schema.org/draft-04/schema"
+    type: 'object'
+    required: ['initial']
+    properties:
+      initial: { type: 'string' }
+      nonexist: { type: 'number' }
+  .successExample 'correct-headers',
+    headers:
+      'Content-Type': 'application/json'
+    responseCode: 200
+    responseBody:
+      'initial': 'Foo'
+  .failExample 'wrong-content-type',
+    headers:
+      'Content-Type': 'text/html'
+    responseCode: 422
 
-
-createSchema =
-  id: 'newresource.json'
-  '$schema': 'http://json-schema.org/draft-04/schema'
-  type: 'object'
-  required: ['name', 'tags']
-  properties:
-    name: { type: 'string' }
-    tags: { type: 'array', uniqueItems: true, items: { type: 'string' } }
 contracts.createResource = jsonApiFunction 'POST', '/newresource'
-.pre conditions.requestSchema createSchema
-.post conditions.responseStatus 201
-.post conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
+  .pre conditions.requestSchema
+    id: 'newresource.json'
+    '$schema': 'http://json-schema.org/draft-04/schema'
+    type: 'object'
+    required: ['name', 'tags']
+    properties:
+      name: { type: 'string' }
+      tags: { type: 'array', uniqueItems: true, items: { type: 'string' } }
+  .post conditions.responseStatus 201
+  .post conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
 
 
 ## Database access
