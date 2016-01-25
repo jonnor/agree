@@ -13,7 +13,7 @@ conditions.requestContentType = (type) ->
   return new agree.Condition check, "Request must have Content-Type '#{type}'", { 'content-type': type }
 
 # TODO: move schema things to separate file ./schema.coffee
-# TODO: allow to infer schema from an example object
+# TODO: allow to infer schema from example object(s). TODO: check existing libraries for this feature
 # MAYBE: combine inferred schema, with class-invariant,
 #    to ensure all properties are declared in constructor with defaults?
 #    if used as pre-condition on other functions, basically equivalent to a traditional class type!

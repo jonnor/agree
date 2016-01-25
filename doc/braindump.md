@@ -50,9 +50,8 @@ As a particular implementation of this concept could use
 2. Promise/function chains, exported on module-level
 Would have contracts attached, and the 'body' of the code
 be captured but not executed to prevent side-effects.
-3. ? example propagation through chain ?
 
-Example propagation
+### Example propagation
 
 * use predicate valid/examples, insert into chain
 * verify passing precondition,
@@ -73,6 +72,15 @@ valid pre-condition examples cause post-conditions to fail.
 Input data normally used in (unit/behaviour) tests could be good real-life
 examples for predicates. Ideally one could declare them one place,
 and would be able to act in both capabilities.
+
+### Pairwise coupling
+
+Instead of doing propagation from beginning of a long chain,
+try to check the pairs connected together. That is, if data exists
+that passes a post-condition of source, but fails pre-condition of target.
+If this exists, then is an indicator of broken combination, or wrong pre/post-conditions.
+If no examples can be found, no reasoning can be performed, which could
+also be considered a failure (at least in stricter modes).
 
 ## References
 
@@ -172,6 +180,13 @@ we may want to applying contracts for specifying and verifying dataflow / FBP pr
 
 Ideally this would allow us to reason about whole (hierarchical) graphs, aided by contracts.
 
+It may also be interesting to be able to easily create NoFlo components from (especially async),
+functions with Agree contracts. Can we and do we want to provide integration tools for this?
+Like a NoFlo ComponentLoader or similar...
+A tricky part is handling of multiple inputs, can this be done in an automatic way?
+Can we retain the ability to reason about chains of Promises this way, when individual
+chains are plugged together by NoFlo graph connections?
+
 References
 
 * [Contract-based Specification and Verification of Dataflow Programs](http://icetcs.ru.is/nwpt2015/SLIDES/JWiik_NWPT15_presentation.pdf).
@@ -208,6 +223,81 @@ However, such tools cannot enforce things beyond syntax. For example:
 
 Possibly this could be done by having a set of contracts,
 which all code in a library/module/class obeys?
+
+# Contracts and user-interfaces
+
+As of Jan 2016, most thinking/testing has been on applying to web backend services or small (domain-independent) units.
+However, user interfaces, especially in browsers, is an area where JavaScript is even bigger.
+In particular, application to functional/reactive styles as popularized by React is worth some consideration.
+
+* Forms/fields. Input validation, whether/how to shown UI elements.
+* Model data validation. Both coming from view, and going to view.
+* Ensuring that data is shown on screen, possibly in a particular manner.
+* Authentication and roles, and their implications on available UI/actions.
+* Integration with API/services. Very similar as concerns on backend side, just inverted?
+
+For highly interactive UIs, like in games, availability of actions may depend on particular game states,
+which could also be interesting to model as contracts.
+
+# Benefits of contracts
+
+Since contract programming / design-by-contracts is not a common tool/technique,
+will likely need to explain the benefits to convince someone to try it out.
+Especially relation, and differences to, (static) typing, and automated testing
+may be revealing.
+<!-- TODO: document this somewhere in project description/README -->
+
+Important to note, that contracts does not exclude (static) typing nor automated testing.
+In fact, probably best seen as complimentary. Use together, especially with automated tests!
+
+* Unlike automated tests, validates each and every execution, including in production.
+More exhaustive coverage, reducing things that slip through.
+* Can encode/enforce more info than (conventional) typing systems.
+Reaching expressitivity only available with algebraic types, dependent types and effect typing.
+Neither of these are commonly available for JavaScript right now.
+* Produces informational error messages as side-effect of verification
+* (should) Less effort spent for same verification/coverage level
+* (maybe) Allow for static reasoning of programs.
+Proved achievable for static systems, like Code Contract for .NET.
+Yet unproven for JavaScript, see section 'quasi-static analysis' for details.
+
+## Benefits of Agree approach
+
+Fact that we're applying to a highly dynamic language, that it is a library,
+and focused on introspection are probably the key elements here.
+
+Note: Not all these realized yet! Some are hypothetical, possibly even theoretical.
+
+Library
+
+* No special language features required
+* No special build or compiler required
+* Contracts are just code, can be manipulated programatically with JS
+* Can be applied to existing code without changing it (only adding)
+* Invisible to calling code, can use inside libraries/modules
+* Can be introduced gradually in codebase
+
+Introspection
+
+* Test/code-coverage
+* Documentation generation
+* Self-documenting
+* Automated test-generation
+* Self-testing
+* Tracing
+* (maybe) Quasi-static analysis
+
+
+## Limitations and Drawbacks
+
+Nothing is perfect. What are they? How to mitigate?
+
+* Requires using a/this library, must be included at runtime.
+Mitigation: few dependencies, minimize code size.
+* Wraps functions at runtime, using functions for conditions
+Mitigation: test, minimize and document performance impact.
+Provide best-practices on how to check if this is a problem, and what to do if it is.
+* Has/suggests a particular coding style
 
 # Best practices with contracts
 

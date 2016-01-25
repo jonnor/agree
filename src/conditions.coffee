@@ -2,10 +2,9 @@
 # Some of these can be generic and provided by framework, parametriced to 
 # tailor to particular program need.
 #
-# TODO: allow/encourage to attach failing and passing examples to contract,
+# TODO: allow/encourage to attach failing and passing examples to condition (not just to contract)
 #  - use for tests/doc of the contract/predicate itself
 #  - basis for further reasoning, ref doc/brainstorm.md
-#  - .precondition(kkk).valid(barisbaz: { bar: baz }).invalid(missingbar: { foo: bar })
 #
 # TODO: generalize the composition/parametrization of predicates?
 # - look up an identifier (string, number) in some context (arguments, this)
@@ -14,8 +13,15 @@
 #
 # TODO: find a way to ensure that conditions don't have side-effects!
 #
-# Ideas:
-# IDEA: allow to generate/composte conditions out of JSON schemas
+# MAYBE: allow pre (and post) conditions to be async by returning a Promise
+# This may be needed for some things, like validating preconditions or ensuring post-conditions
+# which cannot be accessed sync, like in a database, external filesystem
+# Right now, solution for these things is to have a dedicated function before/after, which
+# fetches relevant state, and then do pre/post-conditions on thats.
+# With both ways, this opens up for race conditions, between fetching/checking preconditions and
+# executing the body of functions, because it is no longer in one iteration of eventloop
+# This would still be possible even if we do support Promises though
+# Need to see how it plays out in practical examples...
 
 agree = require './agree'
 Condition = agree.Condition

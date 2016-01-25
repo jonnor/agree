@@ -1,6 +1,7 @@
 
 ## Documentation
 # - TODO: allow to generate HTML API docs; including pre,post,classinvariants
+# - TODO: allow programs using Agree docs, to have a function they can call in order to 'self-document'
 
 common = require './common'
 introspection = require './introspection'
@@ -27,6 +28,7 @@ extractDoc = (module) ->
     }
 
     # TODO: also extract exported Conditions
+    # TODO: extract recursively, not just on top-level. Mirror hierarchy, or flatten tree?
 
   return structured
 

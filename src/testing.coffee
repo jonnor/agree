@@ -11,6 +11,10 @@
 # - TODO: if there are 0 tests found, print error and exit
 # - FIXME: add some basic tests for testing tools...
 # - MAYBE: add a structured output format
+# - TODO: allow Agree users to trigger a self-test using an API
+# - MAYBE: can we generate mock objects, or mock services (HTTP) from Agree data?
+#    Can this be done from the contracts alone, such that one could publish this
+#    as an open executable specification of interface, even if (canonical) implementation is propriatery?
 
 common = require './common'
 
