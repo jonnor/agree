@@ -88,16 +88,24 @@ exports.installExpressRoutes = (app, routes) ->
       console.log "WARN: Contract '#{contract.name}' missing HTTP method/path"
 
 exports.mockingMiddleware = (req, res, next) ->
-  # attaches data sent with json() function
-  original = res.json
+  original =
+    json: res.json
+    end: res.end
+  # attache data sent with json() function to response, so we can validate
   res.json = (obj) ->
     res._jsonData = obj
-    original.apply res, [obj]
+    original.json.apply res, [obj]
+  # defer end of response to next mainloop, so failing post-conditions can respond instead
+  res.end = () ->
+    setTimeout () ->
+      original.end.apply res, arguments
+    , 0
   next()
 
 exports.requestFail = (i, args, failures, reason) ->
   [req, res] = args
-  res.status 422
+  statusCode = if reason == 'preconditions' then 422 else 500
+  res.status statusCode
   errors = failures.map (f) -> { condition: f.condition.name, message: f.error.toString() }
   res.json { errors: errors }
 
