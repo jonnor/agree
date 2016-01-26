@@ -29,6 +29,7 @@
     "tv4": "^1.2.7"
   },
   "devDependencies": {
+    "aglio": "^2.2.0",
     "body-parser": "^1.14.2",
     "chai": "^1.9.1",
     "express": "^4.13.3",
