@@ -77,6 +77,6 @@ describe 'agree-doc', ->
             return done err if err
             chai.expect(html).to.be.a.string
             chai.expect(html).to.include '<html><head>'
-            chai.expect(warnings, warnings).to.have.length 0
+            chai.expect(warnings, JSON.stringify(warnings)).to.have.length 0
             done()
 
