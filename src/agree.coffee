@@ -287,6 +287,7 @@ class FunctionContract
             valid: true
             name: name
             payload: payload
+            type: payload._type if payload._type?
         return this
 
     failExample: (name, payload) ->
@@ -294,6 +295,7 @@ class FunctionContract
             valid: false
             name: name
             payload: payload
+            type: payload._type if payload._type?
         return this
 
 
