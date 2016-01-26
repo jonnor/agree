@@ -114,6 +114,9 @@ exports.selfDocument = (routes, path) ->
   f = new agree.FunctionContract "Documentation: GET #{path}"
     .attr 'http_method', 'GET'
     .attr 'http_path', path
+    .attr 'http_resource', 'HTTP API Documentation'
+    .ensures conditions.responseStatus 200
+    .ensures conditions.responseContentType 'text/html'
     .implement (req, res) ->
       agree.doc.document routes, 'blueprint-html', (err, doc) ->
         throw err if err # XXX: HACK
