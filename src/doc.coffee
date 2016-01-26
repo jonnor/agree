@@ -147,6 +147,13 @@ renderBlueprint = (doc, options) ->
   str = header + '\n\n' + routes.join('\n')
   return str
 
+exports.htmlFromBlueprint = (blueprint, callback) ->
+  aglio = require 'aglio'
+  options =
+    themeVariables: 'default'
+  aglio.render blueprint, options, (err, html, warnings) ->
+    return callback err, html, warnings
+
 exports.main = main = () ->
   path = require 'path'
 

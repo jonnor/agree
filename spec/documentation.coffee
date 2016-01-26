@@ -43,7 +43,7 @@ describe 'agree-doc', ->
         chai.expect(stdout).to.include 'Response body follows schema'
 
     describe 'requesting API Blueprint docs', ->
-
+      blueprint = ''
       it 'exitcode is 0', (done) ->
         agreeDoc example, ['--blueprint'], (err, sout, serr) ->
           stdout = sout
@@ -51,7 +51,6 @@ describe 'agree-doc', ->
           chai.expect(err).to.not.exist
           return done err
       describe 'Blueprint', ->
-        blueprint = ''
         before () ->
           blueprint = stdout
         it 'has header', () ->
@@ -71,4 +70,13 @@ describe 'agree-doc', ->
         it 'has Schema', () ->
           chai.expect(blueprint).to.include '+ Schema\n'
           chai.expect(blueprint).to.include '"$schema": "http://json-schema.org/draft-04/schema"'
+
+      describe 'Rendering HTML from Blueprint', -> 
+        it 'should succeed without warnings', (done) ->
+          agree.doc.htmlFromBlueprint blueprint, (err, html, warnings) ->
+            return done err if err
+            chai.expect(html).to.be.a.string
+            chai.expect(html).to.include '<html><head>'
+            chai.expect(warnings).to.have.length 0
+            done()
 
