@@ -21,7 +21,8 @@ jsonApiFunction = (method, path) ->
 contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
   .post conditions.responseStatus 200
   .post conditions.responseContentType 'application/json'
-  .post conditions.responseSchema 'somedata.json',
+  .post conditions.responseSchema
+    id: 'somedata.json'
     type: 'object'
     required: ['initial']
     properties:
@@ -41,7 +42,8 @@ contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
     responseCode: 422
 
 contracts.createResource = jsonApiFunction 'POST', '/newresource'
-  .pre conditions.requestSchema 'newresource.json',
+  .pre conditions.requestSchema
+    id: 'newresource.json'
     type: 'object'
     required: ['name', 'tags']
     properties:
@@ -77,14 +79,14 @@ routes.getSomeData = contracts.getSomeData.attach (req, res) ->
   db.get 'somekey'
   .then (data) ->
     res.json data
-    Promise.resolve null
+    Promise.resolve res
 
 routes.createResource = contracts.createResource.attach (req, res) ->
   db.add 'newresource', res.body
   .then (key) ->
     res.set 'Location', "/newresource/#{key}"
     res.status(201).end()
-    Promise.resolve null
+    Promise.resolve res
 
 ## Setup
 express = require 'express'
