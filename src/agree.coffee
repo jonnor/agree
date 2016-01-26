@@ -385,4 +385,6 @@ agree.ClassContract = ClassContract
 agree.Class = (name) ->
     return new ClassContract name
 
+agree.Promise = Promise # so others can easily use it for compat with old JS runtimes
+
 module.exports = agree

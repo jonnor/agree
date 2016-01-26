@@ -5,6 +5,7 @@ catch e
   agree = require 'agree' # when running as standalone example
 agreeExpress = agree.express
 conditions = agreeExpress.conditions
+Promise = agree.Promise # polyfill for node.js 0.10 compat
 
 ## Contracts
 # In production, Contracts for public APIs should be kept in a separate file from implementation
