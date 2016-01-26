@@ -76,17 +76,31 @@ renderBlueprint = (doc, options) ->
     action = attr.http_action or contract.name
 
     includeIndent = '\t\t\t'
+    indented = (s) ->
+      lines = s.split('\n').map (l) -> includeIndent + l
+      return lines.join '\n'
     jsonIndented = (o) ->
       json = JSON.stringify o, null, 2
-      lines = json.split('\n').map (l) -> includeIndent + l
-      return lines.join '\n'
+      return indented json
+    jsonStringifyIfNotString = (o) ->
+      if typeof o == 'object'
+        return JSON.stringify o, null, 2
+      else
+        return o
 
     str = """
     \#\# #{resource} [#{path}]
     \#\#\# #{action} [#{method}]
     """
 
-    # TODO: include examples request/responses
+    exampleBody =
+      request: null
+      response: null
+    for ex in contract.examples
+      continue if ex.type != 'http-request-response'
+      continue if not ex.valid # only show things which works
+      exampleBody.request = jsonStringifyIfNotString(ex.payload.body) if ex.payload.body?
+      exampleBody.response = jsonStringifyIfNotString(ex.payload.responseBody) if ex.payload.responseBody?
 
     # Request section
     requestType = null
@@ -96,7 +110,8 @@ renderBlueprint = (doc, options) ->
       requestType = p.details['content-type'] if p.details?['content-type']?
 
     str += "\n\n  + Request (#{requestType})" if requestType
-    str += "\n\n    + Schema \n\n#{jsonIndented(requestSchema)}\n\n" if requestSchema
+    str += "\n\n    + Schema \n\n#{jsonIndented(requestSchema)}\n" if requestSchema
+    str += "\n\n    + Body \n\n#{indented(exampleBody.request)}\n" if exampleBody.request?
 
     # Reponse section
     responseHeaders = {}
@@ -111,11 +126,12 @@ renderBlueprint = (doc, options) ->
       #console.log 'p', p.details
       
     str += "\n\n  + Response #{responseCode} (#{responseType})" if responseCode and responseType
-    str += "\n\n    + Schema \n\n#{jsonIndented(responseSchema)}\n\n" if responseSchema
+    str += "\n\n    + Schema \n\n#{jsonIndented(responseSchema)}\n" if responseSchema
     if Object.keys(responseHeaders).length
       str += "\n\n    + Headers\n"
       for k, v of responseHeaders
         str += "\n#{includeIndent}#{k}: #{v}"
+    str += "\n\n    + Body \n\n#{indented(exampleBody.response)}\n" if exampleBody.response?
 
     return str
 
