@@ -110,8 +110,8 @@ renderBlueprint = (doc, options) ->
       requestType = p.details['content-type'] if p.details?['content-type']?
 
     str += "\n\n  + Request (#{requestType})" if requestType
-    str += "\n\n    + Schema \n\n#{jsonIndented(requestSchema)}\n" if requestSchema
-    str += "\n\n    + Body \n\n#{indented(exampleBody.request)}\n" if exampleBody.request?
+    str += "\n\n    + Body\n\n#{indented(exampleBody.request)}\n" if exampleBody.request?
+    str += "\n\n    + Schema\n\n#{jsonIndented(requestSchema)}\n" if requestSchema
 
     # Reponse section
     responseHeaders = {}
@@ -126,12 +126,12 @@ renderBlueprint = (doc, options) ->
       #console.log 'p', p.details
       
     str += "\n\n  + Response #{responseCode} (#{responseType})" if responseCode and responseType
-    str += "\n\n    + Schema \n\n#{jsonIndented(responseSchema)}\n" if responseSchema
+    str += "\n\n    + Body\n\n#{indented(exampleBody.response)}\n" if exampleBody.response?
+    str += "\n\n    + Schema\n\n#{jsonIndented(responseSchema)}\n" if responseSchema
     if Object.keys(responseHeaders).length
       str += "\n\n    + Headers\n"
       for k, v of responseHeaders
         str += "\n#{includeIndent}#{k}: #{v}"
-    str += "\n\n    + Body \n\n#{indented(exampleBody.response)}\n" if exampleBody.response?
 
     return str
 
