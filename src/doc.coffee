@@ -33,7 +33,7 @@ extractDoc = (module) ->
   return structured
 
 # TODO: use some proper templating engine
-renderCommandline = (doc, options) ->
+renderPlainText = (doc, options) ->
   n =
     functions: Object.keys(doc.functions).length
     classes: Object.keys(doc.classes).length
@@ -154,12 +154,25 @@ exports.htmlFromBlueprint = (blueprint, callback) ->
   aglio.render blueprint, options, (err, html, warnings) ->
     return callback err, html, warnings
 
+exports.document = (module, type, callback) ->
+  docs = extractDoc module
+  if type == 'blueprint'
+    r = renderBlueprint docs, {}
+    return callback null, r
+  if type == 'blueprint-html'
+    b = renderBlueprint docs, {}
+    return exports.htmlFromBlueprint b, callback
+  else
+    r = renderPlainText docs
+    return callback null, r
+
 exports.main = main = () ->
   path = require 'path'
 
   modulePath = process.argv[2]
   modulePath = path.resolve process.cwd(), modulePath
   type = process.argv[3] # FIXME: use proper options parsing
+  type = type.replace('--', '') if type?
 
   try
     module = require modulePath
@@ -167,11 +180,8 @@ exports.main = main = () ->
     console.log e
     console.log e.line
 
-  docs = extractDoc module
-  if type == '--blueprint'
-    r = renderBlueprint docs
-  else
-    r = renderCommandline docs
-  console.log r
+  exports.document module, type, (err, r) ->
+    throw err if err
+    console.log r
 
 main() if not module.parent
