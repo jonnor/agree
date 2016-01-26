@@ -88,13 +88,13 @@ db =
 
 ## Implementation
 routes = {}
-routes.getSomeData = contracts.getSomeData.attach (req, res) ->
+routes.getSomeData = contracts.getSomeData.implement (req, res) ->
   db.get 'somekey'
   .then (data) ->
     res.json data
     Promise.resolve res
 
-routes.createResource = contracts.createResource.attach (req, res) ->
+routes.createResource = contracts.createResource.implement (req, res) ->
   db.add 'newresource', req.body
   .then (key) ->
     res.set 'Location', "/newresource/#{key}"

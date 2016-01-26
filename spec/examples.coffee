@@ -5,7 +5,7 @@ exports.multiplyByTwo = agree.function 'multiplyByTwo'
 .pre agree.conditions.noUndefined
 .pre agree.conditions.numbersOnly
 .post agree.conditions.numbersOnly
-.attach (input) ->
+.implement (input) ->
     return input*2
 
 

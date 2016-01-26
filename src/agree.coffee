@@ -238,8 +238,8 @@ class FunctionContract
         for k,v of defaultOptions
             @options[k] = v if not @options[k]?
 
-    # attach this Contract to an external function
-    attach: (original) ->
+    # implement this Contract in a external function
+    implement: (original) ->
         evaluator = new FunctionEvaluator null, @onError, @options
         func = wrapFunc this, evaluator
         func._agreeContract = this # back-reference for introspection
@@ -250,7 +250,7 @@ class FunctionContract
         return func
 
     body: (func) ->
-        f = @attach func
+        f = @implement func
         if @parent and @parentname
             @parent.klass.prototype[@parentname] = f
         return this

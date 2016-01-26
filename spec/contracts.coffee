@@ -71,10 +71,10 @@ describe 'FunctionContract', ->
         c = agree.function 'shared contract'
           .postcondition conditions.noUndefined
         it 'function not obeying contract should fail', ->
-            fail = c.attach () -> return undefined
+            fail = c.implement () -> return undefined
             chai.expect(() -> fail true).to.throw agree.PostconditionFailed
         it 'function obeying contract should pass', ->
-            pass = c.attach () -> return true
+            pass = c.implement () -> return true
             chai.expect(() -> pass true).to.not.throw
 
 describe 'Contracts on function returning Promise', ->
@@ -84,7 +84,7 @@ describe 'Contracts on function returning Promise', ->
       .postcondition conditions.noUndefined
 
     it 'function obeying contract returns results in .then', (done) ->
-        pass = c.attach () ->
+        pass = c.implement () ->
             return new Promise (resolve) ->
                 resolve 42
         p = pass()
@@ -92,7 +92,7 @@ describe 'Contracts on function returning Promise', ->
             return done()
 
     it 'function erroring returns error in .catch', (done) ->
-        pass = c.attach () ->
+        pass = c.implement () ->
             return new Promise (resolve, reject) ->
                 reject new Error 'rejection hurts'
         p = pass()
@@ -101,7 +101,7 @@ describe 'Contracts on function returning Promise', ->
             return done()
 
     it 'function not obeying post-condition should fail', (done) ->
-        func = c.attach () ->
+        func = c.implement () ->
             return new Promise (resolve) ->
                 resolve undefined
         p = func()
