@@ -40,7 +40,7 @@ describe 'agree-test', ->
       it 'stdout includes passing tests', () ->
         chai.expect(stdout).to.contain 'GET /somedata'
         passes = findPasses(stdout)
-        chai.expect(passes).to.have.length 2
+        chai.expect(passes).to.have.length.above 3
       it 'stdout has no failing tests', () ->
         fails = findFails(stdout)
         chai.expect(fails, fails).to.have.length 0
