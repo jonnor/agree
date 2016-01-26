@@ -99,6 +99,7 @@ routes.createResource = contracts.createResource.implement (req, res) ->
   db.add 'newresource', req.body
   .then (key) ->
     res.set 'Location', "/newresource/#{key}"
+    res.set 'Content-Type', 'application/json' # we promised..
     res.status(201).end()
     Promise.resolve res
 
