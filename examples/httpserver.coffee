@@ -48,6 +48,7 @@ contracts.createResource = jsonApiFunction 'POST', '/newresource'
       name: { type: 'string' }
       tags: { type: 'array', uniqueItems: true, items: { type: 'string' } }
   .ensures conditions.responseStatus 201
+  .ensures conditions.responseContentType 'application/json' # even if we don't have body
   .ensures conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
   .successExample 'Valid data in body',
     _type: 'http-request-response'
