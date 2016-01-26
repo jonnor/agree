@@ -62,7 +62,7 @@ conditions.responseContentType = (type) ->
   return c
 
 checkResponseEnded = (req, res) ->
-  return if not res.finished then new Error 'Response was not finished' else null
+  return if not res._agreeFinished then new Error 'Response was not finished' else null
 conditions.responseEnded = new agree.Condition checkResponseEnded, "Reponse is sent"
 conditions.responseEnded.target = 'arguments'
 
@@ -96,9 +96,10 @@ exports.mockingMiddleware = (req, res, next) ->
     res._jsonData = obj
     original.json.apply res, [obj]
   # defer end of response to next mainloop, so failing post-conditions can respond instead
-  res.end = () ->
+  res.end = (data, enc, cb) ->
+    res._agreeFinished = true
     setTimeout () ->
-      original.end.apply res, arguments
+      original.end.apply res, [data, enc, cb]
     , 0
   next()
 
