@@ -53,18 +53,24 @@ findExampleTypes = (tests) ->
 
   return types
 
-runTests = (tester, tests, callback) ->
+
+
+runTests = (tester, type, tests, callback) ->
   t = tester
   #console.log 'ex', test.examples
 
-  # FIXME: don't assume a single test
-  firstKey = Object.keys(tests)[0]
-  test = tests[firstKey]
+  examples = []
+  for n, atest of tests
+    for en, example of atest.examples
+      if example.payload?._type == type
+        example.test = atest # backref
+        examples.push example
 
   runExample = (ex, cb) ->
       #console.log 'run', test.name, ex.name
+      test = ex.test
       t.run test.thing, test.contract, ex, (err, checks) ->
-        #console.log 'ran', test.name, ex.name, err, results
+        #console.log 'ran', test.name, ex.name, err, checks
         results =
           test: test.name
           example: ex.name
@@ -74,7 +80,7 @@ runTests = (tester, tests, callback) ->
   t.setup (err) ->
     return callback err if err
     #console.log 'setup done'
-    common.asyncSeries test.examples, runExample, (err, results) ->
+    common.asyncSeries examples, runExample, (err, results) ->
       t.teardown (terr) ->
         console.log 'teardown error', terr if terr
         return callback err, results
@@ -126,7 +132,7 @@ exports.main = main = () ->
   knownTypes = Object.keys exports.testers
   throw new Error "Could not find Tester for example type #{type}. Registered: #{knownTypes}" if not tester
 
-  runTests tester, tests, (err, results) ->
+  runTests tester, type, tests, (err, results) ->
     throw err if err
 
     [text, errors] = renderPlainText results

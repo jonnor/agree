@@ -33,8 +33,6 @@ contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
     headers:
       'Content-Type': 'application/json'
     responseCode: 200
-    responseBody:
-      'initial': 'Foo'
   .failExample 'Wrong Content-Type',
     _type: 'http-request-response'
     headers:
@@ -51,7 +49,22 @@ contracts.createResource = jsonApiFunction 'POST', '/newresource'
       tags: { type: 'array', uniqueItems: true, items: { type: 'string' } }
   .post conditions.responseStatus 201
   .post conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
-
+  .successExample 'Valid data in body',
+    _type: 'http-request-response'
+    headers:
+      'Content-Type': 'application/json'
+    body:
+      name: 'myname'
+      tags: ['first', 'second']
+    responseCode: 201
+  .failExample 'Invalid data',
+    _type: 'http-request-response'
+    headers:
+      'Content-Type': 'application/json'
+    body:
+      name: 'valid'
+      tags: [1, 2, 3]
+    responseCode: 422
 
 ## Database access
 # Simulated example of DB or key-value store, for keeping state. SQL or no-SQL in real-life
@@ -82,7 +95,7 @@ routes.getSomeData = contracts.getSomeData.attach (req, res) ->
     Promise.resolve res
 
 routes.createResource = contracts.createResource.attach (req, res) ->
-  db.add 'newresource', res.body
+  db.add 'newresource', req.body
   .then (key) ->
     res.set 'Location', "/newresource/#{key}"
     res.status(201).end()
