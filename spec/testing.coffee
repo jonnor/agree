@@ -18,7 +18,7 @@ agreeTest = (modulePath, callback) ->
 findPasses = (str) ->
   return str.match /^.*: PASS$/mg
 findFails = (str) ->
-  m = str.match /^.*: FAIL$/mg
+  m = str.match /^.*: Error:.*$/mg
   m = [] if not m?
   return m
 
@@ -43,7 +43,7 @@ describe 'agree-test', ->
         chai.expect(passes).to.have.length 2
       it 'stdout has no failing tests', () ->
         fails = findFails(stdout)
-        chai.expect(fails).to.have.length 0
+        chai.expect(fails, fails).to.have.length 0
 
     describe 'when injecting faults', -> # TODO: implement
       it 'exitcode is non-zero'
