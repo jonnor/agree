@@ -22,7 +22,7 @@ conditions.requestSchema = (schema, options={}) ->
   options.allowUnknown = false if not options.allowUnknown
   schema = agree.schema.normalize schema
   schemaDescription = schema.id
-  schemaDescription = schema if not schemaDescription?
+  schemaDescription = JSON.stringify schema if not schemaDescription?
 
   check = (req, res) ->
     return agree.schema.validate req.body, schema, options
@@ -69,7 +69,7 @@ conditions.responseEnded.target = 'arguments'
 conditions.responseSchema = (schema, options = {}) ->
   options.allowUnknown = false if not options.allowUnknown
   schemaDescription = schema.id
-  schemaDescription = schema if not schemaDescription?
+  schemaDescription = JSON.stringify schema if not schemaDescription?
   schema = agree.schema.normalize schema
   check = (req, res) ->
     return agree.schema.validate res._jsonData, schema, options
