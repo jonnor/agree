@@ -110,6 +110,18 @@ exports.requestFail = (i, args, failures, reason) ->
   errors = failures.map (f) -> { condition: f.condition.name, message: f.error.toString() }
   res.json { errors: errors }
 
+exports.selfDocument = (routes, path) ->
+  f = new agree.FunctionContract "Documentation: GET #{path}"
+    .attr 'http_method', 'GET'
+    .attr 'http_path', path
+    .implement (req, res) ->
+      agree.doc.document routes, 'blueprint-html', (err, doc) ->
+        throw err if err # XXX: HACK
+        res.set 'Content-Type', 'text/html'
+        res.end doc
+
+  routes['selfDocument'] = f
+
 class Tester
     constructor: (@app) ->
       @port = process.env.PORT or 3334

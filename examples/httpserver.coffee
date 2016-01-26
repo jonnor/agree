@@ -110,6 +110,7 @@ bodyparser = require 'body-parser'
 app = express()
 app.use bodyparser.json()
 app.use agreeExpress.mockingMiddleware
+agreeExpress.selfDocument routes, '/'
 agreeExpress.installExpressRoutes app, routes
 module.exports = routes # for introspection by Agree tools
 agree.testing.registerTester 'http-request-response', new agreeExpress.Tester app
