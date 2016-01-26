@@ -132,16 +132,19 @@ class Tester
         path: path
       r.headers = test.headers if test.headers?
       req = http.request r
-      responseBody = ""
+      if typeof test.body == 'object'
+        json = JSON.stringify test.body
+        req.write json
       req.on 'response', (res) ->
+        responseBody = ""
         res.on 'data', (chunk) ->
           responseBody += chunk.toString 'utf-8'
         res.on 'end', () ->
           checks = []
           if test.responseCode?
             if test.responseCode != res.statusCode
-              err = new Error "Wrong response status. Expected #{test.responseCode}, got #{res.statusCode}"
-            checks.push { name: 'responseStatusCode', error: err} 
+              err = new Error "Wrong response status. Expected #{test.responseCode}, got #{res.statusCode}: \n#{responseBody}"
+            checks.push { name: 'responseStatusCode', error: err}
           return callback null, checks
       req.on 'error', (err) ->
         console.log 'request error', err
