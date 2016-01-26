@@ -256,7 +256,7 @@ class FunctionContract
         return this
 
     ## Fluent construction
-    post: () -> @postcondition.apply @, arguments
+    ensures: () -> @postcondition.apply @, arguments
     postcondition: (conditions, target) ->
         conditions = [conditions] if not conditions.length
         for c in conditions
@@ -265,7 +265,7 @@ class FunctionContract
             @postconditions.push c
         return this
 
-    pre: () -> @precondition.apply @, arguments
+    requires: () -> @precondition.apply @, arguments
     precondition: (conditions) ->
         conditions = [conditions] if not conditions.length
         for c in conditions

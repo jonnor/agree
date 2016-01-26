@@ -2,9 +2,9 @@
 agree = require '../'
 
 exports.multiplyByTwo = agree.function 'multiplyByTwo'
-.pre agree.conditions.noUndefined
-.pre agree.conditions.numbersOnly
-.post agree.conditions.numbersOnly
+.requires agree.conditions.noUndefined
+.requires agree.conditions.numbersOnly
+.ensures agree.conditions.numbersOnly
 .implement (input) ->
     return input*2
 

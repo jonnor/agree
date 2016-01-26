@@ -15,13 +15,13 @@ jsonApiFunction = (method, path) ->
   .attr 'http_method', method
   .attr 'http_path', path
   .error agreeExpress.requestFail
-  .pre conditions.requestContentType 'application/json'
-  .post conditions.responseEnded
+  .requires conditions.requestContentType 'application/json'
+  .ensures conditions.responseEnded
 
 contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
-  .post conditions.responseStatus 200
-  .post conditions.responseContentType 'application/json'
-  .post conditions.responseSchema
+  .ensures conditions.responseStatus 200
+  .ensures conditions.responseContentType 'application/json'
+  .ensures conditions.responseSchema
     id: 'somedata.json'
     type: 'object'
     required: ['initial']
@@ -40,15 +40,15 @@ contracts.getSomeData = jsonApiFunction 'GET', '/somedata'
     responseCode: 422
 
 contracts.createResource = jsonApiFunction 'POST', '/newresource'
-  .pre conditions.requestSchema
+  .requires conditions.requestSchema
     id: 'newresource.json'
     type: 'object'
     required: ['name', 'tags']
     properties:
       name: { type: 'string' }
       tags: { type: 'array', uniqueItems: true, items: { type: 'string' } }
-  .post conditions.responseStatus 201
-  .post conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
+  .ensures conditions.responseStatus 201
+  .ensures conditions.responseHeaderMatches 'Location', /\/newresource\/[\d]+/
   .successExample 'Valid data in body',
     _type: 'http-request-response'
     headers:

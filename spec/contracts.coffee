@@ -32,8 +32,8 @@ agree.Class 'Foo'
 
 
 .method 'setPropCorrect'
-.pre conditions.noUndefined
-.post [conditions.attributeEquals 'prop1', 'bar']
+.requires conditions.noUndefined
+.ensures [conditions.attributeEquals 'prop1', 'bar']
 .body () ->
     @prop1 = 'bar'
 
