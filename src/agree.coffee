@@ -282,6 +282,7 @@ class FunctionContract
         @onError = onError
         return this
 
+    # TODO: Error if example does not pass pre and post-conditions
     successExample: (name, payload) ->
         @examples.push
             valid: true
@@ -290,6 +291,9 @@ class FunctionContract
             type: payload._type if payload._type?
         return this
 
+    # TODO: Error if example passes pre-conditions
+    # XXX: Do we need another .type of failing examples, post-fail..
+    # causes post-conditions to fail, but has valid input?
     failExample: (name, payload) ->
         @examples.push
             valid: false
