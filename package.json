@@ -21,7 +21,8 @@
   },
   "bin": {
     "agree-doc": "./bin/agree-doc",
-    "agree-test": "./bin/agree-test"
+    "agree-test": "./bin/agree-test",
+    "agree-analyze": "./bin/agree-analyze"
   },
   "dependencies": {
     "bluebird": "^3.1.1",
