@@ -78,8 +78,7 @@ describe 'FunctionContract', ->
             chai.expect(() -> pass true).to.not.throw
 
 describe 'Contracts on function returning Promise', ->
-    bluebird = require 'bluebird'
-    Promise = bluebird
+    Promise = agree.Promise
     c = agree.function 'shared contract'
       .postcondition conditions.noUndefined
 
