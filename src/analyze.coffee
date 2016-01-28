@@ -29,6 +29,8 @@
 # Can happen both when refactoring a codebase, or when a library is updated
 # -> programmer must update call-site, revert change, or add adapter
 
+agree = require './agree'
+
 checkPromisePairs = (chain) ->
     # Find pairwise functions, A & B, and their respective contracts
     # Generate example values satisfying postcond(A)
@@ -37,6 +39,41 @@ checkPromisePairs = (chain) ->
     # Check each example against precond(B) to find violations
     #  (later) reduce the case to a minimal one
     # Report
+
+generateExampleOutputs = (contract) ->
+  # TODO: also support inferring/synthesizing from examples of the Condition
+  possible = []
+  for ex in contract.examples
+    continue if not ex.valid
+    continue if not ex.type == 'function-call' # TODO: support transforming from other types?
+    possible.push ex
+
+  examples = []
+  for ex in possible
+    failures = contract.postconditions.filter (c) ->
+      err = c.check ex.payload.returns
+      return err?
+    examples.push ex if failures.length < 1
+
+  return examples
+
+checkPreconditions = (contract, examples) ->
+  examples.map (ex) ->
+    failures = contract.preconditions.filter (c) ->
+      err = c.check ex.payload.returns
+      return err?
+    r =
+      example: ex
+      valid: failures.length == 0
+      failures: failures
+    return r
+
+exports.checkPairs = (source, target) ->
+  source = agree.getContract source
+  target = agree.getContract target
+
+  exs = generateExampleOutputs source
+  res = checkPreconditions target, exs
 
 exports.main = main = () ->
     throw new Error 'Not implemented yet'
