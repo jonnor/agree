@@ -29,16 +29,36 @@
 # Can happen both when refactoring a codebase, or when a library is updated
 # -> programmer must update call-site, revert change, or add adapter
 
+# MAYBE: Support reducing failures to a minimal case
+
 agree = require './agree'
 
-checkPromisePairs = (chain) ->
-    # Find pairwise functions, A & B, and their respective contracts
-    # Generate example values satisfying postcond(A)
-    #  can be successExample of Contract
-    #  (later) be synthesized/inferred from Condition examples
-    # Check each example against precond(B) to find violations
-    #  (later) reduce the case to a minimal one
-    # Report
+findPromisePairs = (promise) ->
+  # Introspection currently relies on monkeypatched agree.Promise
+  # FIXME: handle unable to introspect
+  pairs = []
+  parentKey = '_promise0'
+  parentKey = '_agreeParentPromise'
+  parent = null
+  while true
+    pairs.push
+      source: promise[parentKey]
+      target: promise
+    f = promise._fulfillmentHandler0
+    #console.log f?
+    #console.log promise if not f?
+    promise = promise[parentKey]
+    break if not promise?
+
+  pairs = pairs.reverse()
+  for p in pairs
+    prop = '_fulfillmentHandler0'
+    #console.log p.source?[prop]?, p.target?[prop]?
+    s = agree.getContract p.source?[prop]
+    t = agree.getContract p.target?[prop]
+    #console.log " #{s?.name} -> #{t?.name}"
+
+  return pairs
 
 generateExampleOutputs = (contract) ->
   # TODO: also support inferring/synthesizing from examples of the Condition
@@ -68,12 +88,23 @@ checkPreconditions = (contract, examples) ->
       failures: failures
     return r
 
-exports.checkPairs = (source, target) ->
+checkPair = (source, target) ->
   source = agree.getContract source
   target = agree.getContract target
 
   exs = generateExampleOutputs source
   res = checkPreconditions target, exs
+  #console.log 's', res, exs, source, target
+  return res
+
+exports.checkPromise = checkPromise = (promise) ->
+    # Find pairwise functions, A & B, and their respective contracts
+  pairs = findPromisePairs promise
+  pairs = pairs.filter (p) ->
+    return p.source?._fulfillmentHandler0? and p.target?._fulfillmentHandler0?
+  #console.log 'p', pairs
+  pairs.map (p) ->
+    checkPair p.source._fulfillmentHandler0, p.target._fulfillmentHandler0
 
 exports.main = main = () ->
     throw new Error 'Not implemented yet'
