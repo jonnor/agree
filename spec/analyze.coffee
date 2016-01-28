@@ -56,7 +56,7 @@ deferred = (trigger) ->
   return p
     
 
-describe.only 'Static analysis of Promise chain', ->
+describe 'Static analysis of Promise chain', ->
 
   describe 'functions with compatible contracts', ->
     trigger = {}        
