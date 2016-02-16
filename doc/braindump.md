@@ -193,7 +193,7 @@ Can be seen as a kind of [mutation testing](https://en.wikipedia.org/wiki/Mutati
 but where we can make stronger inferences because we know more about
 the structure and semantics of the program.
 
-# Composition of code using contracts
+# Composition of code that uses contracts
 
 Ideally any standard JavaScript way of combining the functions/classes using contracts (mostly imperative)
 would give all benefits of the contracts, like static verification and test generation.
@@ -225,14 +225,97 @@ we may want to applying contracts for specifying and verifying dataflow / FBP pr
 
 Ideally this would allow us to reason about whole (hierarchical) graphs, aided by contracts.
 
+There are a couple different levels one could integrate:
+
+1. On ports. Check conditions against data on inport, and check conditions on data send on outport.
+This is basically a type system.
+2. In the runtime, for verifying components are generally well-behaved.
+3. On individual components. Primarily for ensuring they perform their stated function correctly.
+
+## 1. Contracts on port data
+
+Schema (JSON) and similar conditions are the most relevant here.
+
+## 2. Runtime enforcing contracts on component behavior
+
+For instance, component may declares they are of some kind / has a certain trait,
+so that the runtime can know what to expect of the component. Examples may include:
+
+* sync: Sends packets directly upon activation.
+* async: Send packets some time after activation.
+* generator: Has a port for activating and one for de-activating.
+Sends packets at arbitrary times, as long as is active.
+
+May also consider having traits like:
+
+* one-outpacket: Each activation causes one packet to be sent, on a single port.
+* one-on-each: Each activation causes one packet to be sent on each (non-error) outport.
+* output-or-error: Each activation either causes normal output OR an error, never both.
+
+If the component disobeys any of these constraints, the runtime raises an error.
+
+In general it may be better to avoid most of the potential issues by having an
+API which is hard or impossible to misuse. But when the range of 'valid' behavior is
+large, this approach may have benefits.
+It can help pin-point which component caused a problem instead of only seeing it down the flow,
+which massively reduces debugging time.
+
+## 3. Component contracts
+
+For the particular functionality provided by a component,
+we need more fine-grained contracts than component traits/types.
+
+The type of contracts most interesting is probably those specifying relations between input and output.
+Examples:
+
+* Output value is always a multiple of the input value
+* Output value is always higher or lower than input value
+* Always sends as many packets as the length of input array
+
+The constracts would checked at runtime, but also be the basis for generating automated tests.
+
+## NoFlo integration
+
+A challenge is that unlike with call-return and call-continuationcall,
+it is not apparent when an execution of a component is 'done'.
+And with NoFlo 0.5, components can act on packets send in an out-of-order manner,
+because it is the components (not the runtime) which queue up data to check whether groups etc match
+what is needed to 'fire' / activate.
+
+Right now these state transitions are implicit and unobservable.
+This would need to change in order to apply contracts like in 2) or 3).
+
+The contracts conditions would need access to all the data for one activation.
+This could be a datastructure like:
+
+```
+inputs:
+  inport1: [ valueA, ... ]
+  inport2: [ valueB, ... ]
+outputs:
+  out1: [ outValue, ... ]
+```
+This assumes that sending/receiving order is irrelevant, which is arguably a desirable property anyway.
+If this is not feasible, the datastructure could be `inputs: [ port: inport1, data: valueA ]`.
+
+Since NoFlo 0.6 has IP objects which carry the actual values,
+it may be that this should be exposed here instead of the raw values.
+This would allow verifying things like scoping and groups behavior.
+
+## Using contracted function as component
+
 It may also be interesting to be able to easily create NoFlo components from (especially async),
 functions with Agree contracts. Can we and do we want to provide integration tools for this?
 Like a NoFlo ComponentLoader or similar...
+
 A tricky part is handling of multiple inputs, can this be done in an automatic way?
+If component handles activation strategy, it can collect multiple inputs keyed by the port name.
+Promises can only have one input value, so it needs to be objects anyways.
+
 Can we retain the ability to reason about chains of Promises this way, when individual
 chains are plugged together by NoFlo graph connections?
 
-References
+## References
 
 * [Contract-based Specification and Verification of Dataflow Programs](http://icetcs.ru.is/nwpt2015/SLIDES/JWiik_NWPT15_presentation.pdf).
 Defines concept of `network invariants` and `channel invariants`, and verification strategy both for
