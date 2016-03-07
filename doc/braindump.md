@@ -470,6 +470,7 @@ though these are often unefficient when applied to software verification.
 
 (possibly) JavaScript-friendly solvers
 
+* [Logictools](https://github.com/tammet/logictools). Standalone JS solver(s), including DPLL SAT solver
 * [Boolector, compiled to JS](https://github.com/jgalenson/research.js/tree/master/boolector)
 * [MiniSAT, compiled to JS](http://www.msoos.org/2013/09/minisat-in-your-browser/)
 * [STP, compiled to JS](https://github.com/stp/stp/issues/191) (seemingly built on MiniSAT)
