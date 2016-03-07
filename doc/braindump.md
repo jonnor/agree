@@ -476,10 +476,22 @@ though these are often unefficient when applied to software verification.
 * [STP, compiled to JS](https://github.com/stp/stp/issues/191) (seemingly built on MiniSAT)
 * [Z3](https://github.com/Z3Prover/z3), could probably be compiled to JS with Emscripten
 * [CVC4](https://github.com/CVC4/CVC4), could probably be compiled to JS with Emscripten
+* [MiniZinc](https://github.com/MiniZinc/libminizinc), medium-level constraint language with solver. Could probably compile to JS with Emscripten. [Large example list](http://www.hakank.org/minizinc/)
+* [google or-tools](https://developers.google.com/optimization/), could probably compile to JS with Emscripten
+* [gecode](http://www.gecode.org), has been [compiled to JS with Esmcripten before](http://www.gecode.org/pipermail/users/2015-April/004665.html)
+* [backtrack](https://github.com/rf/backtrack), experiemental JavaScript CNF SAT solver
+* [condensate](https://github.com/malie/condensate), experiemental JavaScript DPLL SAT solver, with basic CDCL
 
 Verification languages
 
 * [Boogie](https://github.com/boogie-org/boogie), intermediate verification language, used for C# etc.
+
+Related
+
+* [There are no CNF problems](http://sat2013.cs.helsinki.fi/slides/SAT2013-stuckey.pdf).
+Talk about how CNF/SAT has problems compared to medium/high-level modelling approaches for constraint programming.
+* [SAT tutorial](http://crest.cs.ucl.ac.uk/readingGroup/satSolvingTutorial-Justyna.pdf).
+With focus on Conflict-Driven Clause Learning (CDCL)
 
 # Ideas
 
