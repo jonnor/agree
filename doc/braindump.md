@@ -481,6 +481,7 @@ though these are often unefficient when applied to software verification.
 * [gecode](http://www.gecode.org), has been [compiled to JS with Esmcripten before](http://www.gecode.org/pipermail/users/2015-April/004665.html)
 * [backtrack](https://github.com/rf/backtrack), experiemental JavaScript CNF SAT solver
 * [condensate](https://github.com/malie/condensate), experiemental JavaScript DPLL SAT solver, with basic CDCL
+* [picoSAT](http://fmv.jku.at/picosat/), MIT-like, no-dependencies C code. Should be compilable to JavaScript using Emscripten
 
 Verification languages
 
