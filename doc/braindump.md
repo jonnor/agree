@@ -62,7 +62,7 @@ Provide best-practices on how to check if this is a problem, and what to do if i
 
 For public/external APIs, contracts should be declared in an file external from the implementation.
 For instance in a file under ./constracts, then used by files in ./src (implementation) and ./test or ./spec (tests).
-This make sure that changes to publically relied-upon contracts, and get due attention during code review.
+This makes sure that changes to publically relied-upon contracts, and get due attention during code review.
 
 
 # Quasi-static checking
@@ -96,7 +96,7 @@ and requring to trigger all the relevant code paths for good coverage.
 Quasi-static verification is a mix: We execute code (dynamic analysis),
 instead of using a compiler/parser. However, the code is written in a way that
 allows us to reason about it, without needing external inputs to trigger,
-and without causing external effects.
+and without causing external effects during the analysis pass.
 
 The following components are needed
 
@@ -155,6 +155,13 @@ explains motivation/concept of combining static analysis and contracts.
 * [Contracts as a support to static analysis of open systems]
 (http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.160.8164&rep=rep1&type=pdf)
 
+Related concepts
+
+* [Sagas](http://www.cs.cornell.edu/andru/cs711/2002fa/reading/sagas.pdf)
+and [redux-saga](http://yelouafi.github.io/redux-saga/docs/basics/DeclarativeEffects.html),
+where instead of performing async operations with some callback at completion, code yields an *Effect*:
+An object that describes the async action to perform. The motivation seems to be primarily testability.
+Could possibly be used instead of the PromiseChain thing.
 
 # Predicate examples and generative testing
 
@@ -162,7 +169,7 @@ The manually provided examples are good, and neccesary basis,
 for being able to generate testcases and to reason about.
 
 However, it is easy to miss some cases this way. Or put alternatively,
-it is unreasonably tedious to ensure (up front) that this covers everything.
+it is unreasonably tedious to ensure (up front) that manually written examples covers everything.
 
     TODO: move fuzz/mutation tools from poly-test out to a dedicated library, that Agree can use?
 
