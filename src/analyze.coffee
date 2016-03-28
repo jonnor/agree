@@ -33,30 +33,17 @@
 
 agree = require './agree'
 
-findPromisePairs = (promise) ->
-  # Introspection currently relies on monkeypatched agree.Promise
-  # FIXME: handle unable to introspect
+pairsFromChain = (chain) ->
   pairs = []
-  parentKey = '_promise0'
-  parentKey = '_agreeParentPromise'
-  parent = null
-  while true
-    pairs.push
-      source: promise[parentKey]
-      target: promise
-    f = promise._fulfillmentHandler0
-    #console.log f?
-    #console.log promise if not f?
-    promise = promise[parentKey]
-    break if not promise?
+  chain = chain.chain
 
-  pairs = pairs.reverse()
-  for p in pairs
-    prop = '_fulfillmentHandler0'
-    #console.log p.source?[prop]?, p.target?[prop]?
-    s = agree.getContract p.source?[prop]
-    t = agree.getContract p.target?[prop]
-    #console.log " #{s?.name} -> #{t?.name}"
+  for i in [0...chain.length]
+    first = chain[i]
+    second = chain[i+1]
+    if first and second
+      pairs.push
+        source: first
+        target: second
 
   return pairs
 
@@ -97,14 +84,14 @@ checkPair = (source, target) ->
   #console.log 's', res, exs, source, target
   return res
 
-exports.checkPromise = checkPromise = (promise) ->
-    # Find pairwise functions, A & B, and their respective contracts
-  pairs = findPromisePairs promise
-  pairs = pairs.filter (p) ->
-    return p.source?._fulfillmentHandler0? and p.target?._fulfillmentHandler0?
+# TODO: lookup chain from function
+# TODO: allow to check whole modules
+exports.checkChain = checkChain = (chain) ->
+  # Find pairwise functions, A & B, and their respective contracts
+  pairs = pairsFromChain chain
   #console.log 'p', pairs
   pairs.map (p) ->
-    checkPair p.source._fulfillmentHandler0, p.target._fulfillmentHandler0
+    checkPair p.source, p.target
 
 exports.main = main = () ->
     throw new Error 'Not implemented yet'

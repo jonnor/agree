@@ -23,26 +23,12 @@
 agree = require './agree'
 Promise = agree.Promise
 
-# Construct a promise which we can later inject a value into to start the execution chain
-deferred = (trigger, startFunction, startContext) ->
-  state =
-    resolve: null
-    reject: null
-  p = new Promise (resolve, reject) ->
-    state.resolve = resolve
-    state.reject = reject
-  trigger.resolve = (args) ->
-    ret = startFunction.apply startContext, args
-    state.resolve ret
-  trigger.reject = (err) ->
-    state.reject err
-  return p
-
 # TODO: support other Promise composition operators than .then
 # MAYBE: support custom Promise composition operators
 class PromiseChain
   ## describing
   constructor: (@name) ->
+    @_agreeType = 'PromiseChain'
     @startFunction = null
     @chain = []
 
@@ -61,26 +47,28 @@ class PromiseChain
     return this
 
   # Execute the chain
-  _render: () ->
-    trigger = {}
-    start = @startFunction or () -> return arguments[0]
+  toFunction: () ->
+    start = @startFunction
+    if not start
+      start = () ->
+        return arguments[0]
+    chainSelf = this
 
-    promise = deferred trigger, start, this
-    for thenable in @chain
-      promise = promise.then thenable
-    return [promise, trigger]
+    return () ->
+      args = arguments
+      promise = new Promise (resolve, reject) ->
+        ret = start.apply chainSelf, args
+        return resolve ret
 
-  # FIXME: get rid of
-  promisify: () ->
-    [promise, trigger] = @_render()
-    return promise
+      for thenable in chainSelf.chain
+        promise = promise.then thenable
+      return promise
 
   # returns Promise for the whole chain, pushes @value into the first one
   call: (a, ...) ->
-    [promise, trigger] = @_render()
-    args = Array.prototype.slice.call arguments
-    trigger.resolve args
-    return promise
+    #args = Array.prototype.slice.call arguments
+    f = @toFunction()
+    return f.apply this, arguments
 
 Chain = (name) ->
   return new PromiseChain name

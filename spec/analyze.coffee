@@ -54,8 +54,7 @@ describe 'Static analysis of Promise chain', ->
 
   describe 'functions with compatible contracts', ->
     it 'passes check', () ->
-      promise = passingChain.promisify()
-      res = agree.analyze.checkPromise promise
+      res = agree.analyze.checkChain passingChain
       res = res[0]
       fails = res.filter (r) -> return not r.valid
       chai.expect(fails).to.have.length 0
@@ -68,8 +67,7 @@ describe 'Static analysis of Promise chain', ->
   describe 'functions with incompatible contracts', ->
     fails = []
     it 'fails static checking', () ->
-      promise = failingChain.promisify()
-      res = agree.analyze.checkPromise promise
+      res = agree.analyze.checkChain failingChain
       res = res[0]
       fails = res.filter (r) -> return not r.valid
       chai.expect(fails).to.have.length 1
