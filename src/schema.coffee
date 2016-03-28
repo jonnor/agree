@@ -9,6 +9,7 @@
 # MAYBE: combine inferred schema, with class-invariant,
 #    to ensure all properties are declared in constructor with defaults?
 #    if used as pre-condition on other functions, basically equivalent to a traditional class type!
+# TODO: allow to infer schema from Knex schema/queries or Postgres/*SQL schemas
 
 exports.validate = (data, schema, options) ->
   tv4 = require 'tv4'
