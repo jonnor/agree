@@ -54,14 +54,17 @@ class PromiseChain
         return arguments[0]
     chainSelf = this
 
+
     return () ->
+      context = {}
+
       args = arguments
       promise = new Promise (resolve, reject) ->
-        ret = start.apply chainSelf, args
+        ret = start.apply context, args
         return resolve ret
 
       for thenable in chainSelf.chain
-        promise = promise.then thenable
+        promise = promise.then thenable.bind(context)
       return promise
 
   # Render chain into a function, and call it with provided @arguments

@@ -98,18 +98,16 @@ routes.createResource = contracts.createResource.implement (req, res) ->
     res.status(201).end()
     Promise.resolve res
 
-routes.getSomeData = contracts.getSomeData.implement (agree.Chain()
-  .describe 'respond with "somekey" data DB as JSON'
+routes.getSomeData = contracts.getSomeData.implement( agree.Chain()
+  .describe 'respond with "somekey" data from DB as JSON'
   .start (req, res) ->
-    { res: res, key: 'somekey' }
-  .then (state) ->
-    Promise.props
-      data: db.get state.key
-      res: state.res
-  .then (state) ->
-    state.res.json state.data
-    Promise.resolve state.res
-  .toFunction() # return reference to function with signature (res, req) ->
+    @res = res
+    return 'somekey'
+  .then db.get
+  .then (data) ->
+    @res.json data
+    Promise.resolve @res
+  .toFunction() # function with signature like start.. (res, req) ->
 )
 
 ## Setup
