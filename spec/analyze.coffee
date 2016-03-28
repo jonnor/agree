@@ -67,16 +67,20 @@ class PromiseChain
     @chain.push thenable
     return this
 
-  promisify: () ->
+  _render: () ->
     trigger = {}
     promise = deferred trigger
     for thenable in @chain
       promise = promise.then thenable
     return [promise, trigger]
 
+  promisify: () ->
+    [promise, trigger] = @_render()
+    return promise
+
   # returns Promise for the whole chain, pushes @value into the first one
   call: (val) ->
-    [promise, trigger] = @promisify()
+    [promise, trigger] = @_render()
     trigger.resolve val
     return promise
 
@@ -97,7 +101,7 @@ describe 'Static analysis of Promise chain', ->
     trigger = {}        
 
     it 'passes check', () ->
-      [promise] = passingChain.promisify()
+      promise = passingChain.promisify()
       res = agree.analyze.checkPromise promise
       res = res[0]
       fails = res.filter (r) -> return not r.valid
@@ -111,7 +115,7 @@ describe 'Static analysis of Promise chain', ->
   describe 'functions with incompatible contracts', ->
     fails = []
     it 'fails static checking', () ->
-      [promise] = failingChain.promisify()
+      promise = failingChain.promisify()
       res = agree.analyze.checkPromise promise
       res = res[0]
       fails = res.filter (r) -> return not r.valid
