@@ -46,7 +46,7 @@ class PromiseChain
     @chain.push thenable
     return this
 
-  # Execute the chain
+  # Render chain into a function. Calling returned function executes the whole chain
   toFunction: () ->
     start = @startFunction
     if not start
@@ -64,7 +64,7 @@ class PromiseChain
         promise = promise.then thenable
       return promise
 
-  # returns Promise for the whole chain, pushes @value into the first one
+  # Render chain into a function, and call it with provided @arguments
   call: (a, ...) ->
     #args = Array.prototype.slice.call arguments
     f = @toFunction()
