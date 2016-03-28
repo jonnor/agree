@@ -90,12 +90,6 @@ db =
 
 ## Implementation
 routes = {}
-routes.getSomeData = contracts.getSomeData.implement (req, res) ->
-  db.get 'somekey'
-  .then (data) ->
-    res.json data
-    Promise.resolve res
-
 routes.createResource = contracts.createResource.implement (req, res) ->
   db.add 'newresource', req.body
   .then (key) ->
@@ -103,6 +97,20 @@ routes.createResource = contracts.createResource.implement (req, res) ->
     res.set 'Content-Type', 'application/json' # we promised..
     res.status(201).end()
     Promise.resolve res
+
+routes.getSomeData = contracts.getSomeData.implement (agree.Chain()
+  .describe 'respond with "somekey" data DB as JSON'
+  .start (req, res) ->
+    { res: res, key: 'somekey' }
+  .then (state) ->
+    Promise.props
+      data: db.get state.key
+      res: state.res
+  .then (state) ->
+    state.res.json state.data
+    Promise.resolve state.res
+  .toFunction() # return reference to function with signature (res, req) ->
+)
 
 ## Setup
 express = require 'express'
