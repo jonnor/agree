@@ -53,8 +53,6 @@ failingChain = agree.Chain 'fail'
 describe 'Static analysis of Promise chain', ->
 
   describe 'functions with compatible contracts', ->
-    trigger = {}        
-
     it 'passes check', () ->
       promise = passingChain.promisify()
       res = agree.analyze.checkPromise promise

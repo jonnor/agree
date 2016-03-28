@@ -24,43 +24,62 @@ agree = require './agree'
 Promise = agree.Promise
 
 # Construct a promise which we can later inject a value into to start the execution chain
-deferred = (trigger) ->
+deferred = (trigger, startFunction, startContext) ->
   state =
     resolve: null
     reject: null
   p = new Promise (resolve, reject) ->
     state.resolve = resolve
     state.reject = reject
-  trigger.resolve = (val) ->
-    state.resolve val
+  trigger.resolve = (args) ->
+    ret = startFunction.apply startContext, args
+    state.resolve ret
   trigger.reject = (err) ->
     state.reject err
   return p
 
+# TODO: support other Promise composition operators than .then
+# MAYBE: support custom Promise composition operators
 class PromiseChain
+  ## describing
   constructor: (@name) ->
+    @startFunction = null
     @chain = []
+
+  # alternative to setting @name in constructor
+  describe: (@name) ->
+    return this
+
+  # Chaining up operations
+  # FIXME: don't specialcase start internally
+  start: (f) ->
+    @startFunction = f
+    return this
 
   then: (thenable) ->
     @chain.push thenable
     return this
 
+  # Execute the chain
   _render: () ->
     trigger = {}
-    promise = deferred trigger
+    start = @startFunction or () -> return arguments[0]
+
+    promise = deferred trigger, start, this
     for thenable in @chain
       promise = promise.then thenable
     return [promise, trigger]
 
+  # FIXME: get rid of
   promisify: () ->
     [promise, trigger] = @_render()
-    console.log 'p', promise
     return promise
 
   # returns Promise for the whole chain, pushes @value into the first one
-  call: (val) ->
+  call: (a, ...) ->
     [promise, trigger] = @_render()
-    trigger.resolve val
+    args = Array.prototype.slice.call arguments
+    trigger.resolve args
     return promise
 
 Chain = (name) ->
