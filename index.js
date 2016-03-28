@@ -11,5 +11,7 @@ agree.testing = require('./src/testing');
 agree.analyze = require('./src/analyze');
 
 agree.express = require('./src/express'); // TEMP
+agree.chain = require('./src/chain'); // TEMP
+agree.Chain = agree.chain.Chain
 
 module.exports = agree;
