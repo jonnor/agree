@@ -247,6 +247,7 @@ class FunctionContract
         func.toString = () ->
             return introspection.describe this
         func._agreeEvaluator.bodyFunction = original
+        func._agreeChain = original._agreeChain
         return func
 
     body: (func) ->

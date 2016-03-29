@@ -73,6 +73,40 @@ exports.describe = (thing) ->
     output = 'Unknown contract'
     return output
 
+# XXX: hacky representation of PromiseChain as an FBP graph
+chainToFBP = (chain) ->
+  graph =
+    inports: {}
+    outports: {}
+    processes: {}
+    connections: []
+
+  chain.chain.forEach (func, idx) ->
+    name = "then-#{idx}"
+    component = 'agree/Function'
+    graph.processes[name] =
+      component: component
+      metadata: {}
+    conn =
+      src:
+        process: "then-#{idx-1}"
+        port: 'out'
+      tgt:
+        process: name
+        port: 'in'
+    if idx
+      graph.connections.push conn
+  return graph
+
+# TODO: support transforming observed events to FBP runtime network:data,
+# for use with FBP clients like Flowhub and tools like Flowtrace
+exports.toFBP = (thing) ->
+  if thing._agreeType == 'PromiseChain'
+    return chainToFBP thing
+  else if typeof thing == 'function' and thing._agreeChain
+    return chainToFBP thing._agreeChain
+  return null
+
 # XXX: right now can only observe one thing, which might be too inconvenient in practice
 # should possibly observe a set of things. Issue is that then event monitoring / analysis also needs to take filter
 class Observer
