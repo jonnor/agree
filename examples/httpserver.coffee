@@ -123,6 +123,8 @@ agreeExpress.installExpressRoutes app, routes
 module.exports = routes # for introspection by Agree tools
 agree.testing.registerTester 'http-request-response', new agreeExpress.Tester app
 
+require('fs').writeFileSync('agreechain.fbp.json', JSON.stringify(agree.introspection.toFBP(routes.getSomeData), null, 2)+'\n')
+
 ## Run
 main = () ->
   port = process.env.PORT
