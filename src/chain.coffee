@@ -23,6 +23,9 @@
 agree = require './agree'
 Promise = agree.Promise
 
+# TODO: support introspecting 'child' functions from a chained function
+# TODO: support introspecting 'parent' chain from a child function
+
 # TODO: support other Promise composition operators than .then
 # MAYBE: support custom Promise composition operators
 class PromiseChain
@@ -54,9 +57,9 @@ class PromiseChain
         return arguments[0]
     chainSelf = this
 
-
     return () ->
       context = {}
+      this._agreeChain = chainSelf
 
       args = arguments
       promise = new Promise (resolve, reject) ->

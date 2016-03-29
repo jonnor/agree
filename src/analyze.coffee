@@ -84,6 +84,8 @@ checkPair = (source, target) ->
   #console.log 's', res, exs, source, target
   return res
 
+# TODO: check preconditions of first function in chain against contract on chained function
+# TODO: check postcondition of last function...
 # TODO: lookup chain from function
 # TODO: allow to check whole modules
 exports.checkChain = checkChain = (chain) ->
