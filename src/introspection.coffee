@@ -73,6 +73,10 @@ exports.describe = (thing) ->
     output = 'Unknown contract'
     return output
 
+fbpSafeComponentName = (s) ->
+  return null if not s
+  return s.split(' ').join('_')
+
 # XXX: hacky representation of PromiseChain as an FBP graph
 chainToFBP = (chain) ->
   graph =
@@ -81,15 +85,17 @@ chainToFBP = (chain) ->
     processes: {}
     connections: []
 
-  chain.chain.forEach (func, idx) ->
-    name = "then-#{idx}"
-    component = 'agree/Function'
+  names = []
+  chain.chain.forEach (step, idx) ->
+    name = fbpSafeComponentName(step.description) or "then-#{idx}"
+    names.push name
+    component = 'agree/Function' # TODO: use name of Contract if known
     graph.processes[name] =
       component: component
       metadata: {}
     conn =
       src:
-        process: "then-#{idx-1}"
+        process: names[idx-1]
         port: 'out'
       tgt:
         process: name
@@ -97,6 +103,17 @@ chainToFBP = (chain) ->
     if idx
       graph.connections.push conn
   return graph
+
+executionToFlowtrace = (chain) ->
+  # FIXME: actually include events from execution
+  # TODO: allow to synthesize graph from functions
+  trace =
+    header:
+      graphs: {}
+    events: []
+  trace.header.graphs['default'] = chainToFBP chain
+
+  return trace
 
 # TODO: support transforming observed events to FBP runtime network:data,
 # for use with FBP clients like Flowhub and tools like Flowtrace
