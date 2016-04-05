@@ -90,6 +90,7 @@ db =
 
 ## Implementation
 routes = {}
+# Using regular Promises
 routes.createResource = contracts.createResource.implement (req, res) ->
   db.add 'newresource', req.body
   .then (key) ->
@@ -98,13 +99,14 @@ routes.createResource = contracts.createResource.implement (req, res) ->
     res.status(201).end()
     Promise.resolve res
 
+# Using static Promise chain
 routes.getSomeData = contracts.getSomeData.implement( agree.Chain()
   .describe 'respond with "somekey" data from DB as JSON'
   .start (req, res) ->
     @res = res
     return 'somekey'
-  .then db.get
-  .then (data) ->
+  .then 'db.get', db.get
+  .then 'respond with JSON', (data) ->
     @res.json data
     Promise.resolve @res
   .toFunction() # function with signature like start.. (res, req) ->

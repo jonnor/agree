@@ -33,7 +33,7 @@ class PromiseChain
   constructor: (@name) ->
     @_agreeType = 'PromiseChain'
     @startFunction = null
-    @chain = []
+    @chain = [] # { type: 'then', description: "", thenable: function }
 
   # alternative to setting @name in constructor
   describe: (@name) ->
@@ -45,8 +45,16 @@ class PromiseChain
     @startFunction = f
     return this
 
-  then: (thenable) ->
-    @chain.push thenable
+  then: (description, thenable) ->
+    if not thenable
+      thenable = description
+      description = null
+
+    @chain.push
+      type: 'then'
+      description: description
+      thenable: thenable
+      
     return this
 
   # Render chain into a function. Calling returned function executes the whole chain
@@ -65,8 +73,8 @@ class PromiseChain
         ret = start.apply context, args
         return resolve ret
 
-      for thenable in chainSelf.chain
-        promise = promise.then thenable.bind(context)
+      for step in chainSelf.chain
+        promise = promise.then step.thenable.bind(context)
       return promise
 
     func._agreeChain = chainSelf # for introspection

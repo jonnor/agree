@@ -40,10 +40,10 @@ pairsFromChain = (chain) ->
   for i in [0...chain.length]
     first = chain[i]
     second = chain[i+1]
-    if first and second
+    if first?.thenable and second?.thenable
       pairs.push
-        source: first
-        target: second
+        source: first.thenable
+        target: second.thenable
 
   return pairs
 
