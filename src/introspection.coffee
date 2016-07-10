@@ -118,8 +118,6 @@ executionToFlowtrace = (chain) ->
 # TODO: support transforming observed events to FBP runtime network:data,
 # for use with FBP clients like Flowhub and tools like Flowtrace
 exports.toFBP = (thing) ->
-  return executionToFlowtrace thing._agreeChain
-
   if thing._agreeType == 'PromiseChain'
     return chainToFBP thing
   else if typeof thing == 'function' and thing._agreeChain
