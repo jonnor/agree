@@ -225,6 +225,11 @@ may be particularly interesting.
 
 Another composition techniques, include dataflow/FBP and finite state machines (see separate sections).
 
+Related
+
+* [Composability in JS using categories](https://medium.com/@homam/composability-from-callbacks-to-categories-in-es6-f3d91e62451e).
+Very similar abstraction as Promise, but is instead deferred by default. Also got some notes on relationships to monads.
+
 # Contracts & dataflow/FBP
 
 For projects like [NoFlo](http://noflojs.org) and [MicroFlo](http://microflo.org),
