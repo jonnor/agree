@@ -7,6 +7,9 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
+env:
+  matrix:
+  - CXX=g++-4.8
 script: npm test
 deploy:
   provider: npm
