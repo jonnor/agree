@@ -455,6 +455,8 @@ to third-party APIs.
 * [OpenJML/Java Modelling Language](http://jmlspecs.sourceforge.net/),
 combines contracts with [Larch](http://www.eecs.ucf.edu/~leavens/larch-faq.html).
 [Design by Contract with JML](http://www.eecs.ucf.edu/~leavens/JML//jmldbc.pdf). [Wikipedia](https://en.wikipedia.org/wiki/Java_Modeling_Language)
+* [Plumatic Schema](https://github.com/plumatic/schema), schema-based type validation on functions for Closure(Script).
+Interesting connections using schema generators together with property-based / generative testing.
 
 JavaScript verification approaches
 
@@ -505,6 +507,15 @@ Related
 Talk about how CNF/SAT has problems compared to medium/high-level modelling approaches for constraint programming.
 * [SAT tutorial](http://crest.cs.ucl.ac.uk/readingGroup/satSolvingTutorial-Justyna.pdf).
 With focus on Conflict-Driven Clause Learning (CDCL)
+
+## Relation to Hoare logic
+
+Hoare logic 
+
+References
+
+* [A Hoare Logic for Rust](http://ticki.github.io/blog/a-hoare-logic-for-rust/).
+Includes an introduction to Hoare logic, applying it for MIR intermediate representation in Rust compiler.
 
 # Ideas
 
