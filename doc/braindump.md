@@ -458,21 +458,52 @@ combines contracts with [Larch](http://www.eecs.ucf.edu/~leavens/larch-faq.html)
 * [Plumatic Schema](https://github.com/plumatic/schema), schema-based type validation on functions for Closure(Script).
 Interesting connections using schema generators together with property-based / generative testing.
 
+Testing and contracts
+
+* [Enhancing Design by Contract with Know-ledge about Equivalence Partitions](http://www.jot.fm/issues/issue_2004_04/article1.pdf).
+Introduces ability to declare partitions for invariants, which a value can belong to.
+Then uses a test generator based on the transitions between such partitions.
+Also uses an `old` keyword to represent previous value of an instance variable/member, to allow postconditions expressions on it.
+* [Testing by Contract - Combining Unit Testing and Design by Contract](http://www.itu.dk/people/kasper/NWPER2002/papers/madsen.pdf),
+uses the equivalence partitions implied by preconditions to generate inputs to test.
+* [Automatic Testing Based on Design by Contract](http://se.inf.ethz.ch/old/people/ciupa/papers/soqua05.pdf),
+tool for fully automated testing for Eiffel by introspection of the code contracts.
+* [Seven principles of automated testing, B.Meyer](http://se.ethz.ch/~meyer/publications/testing/principles.pdf). Creator of Design By Contracts and Eiffel.
+Definition of a 'Test Oracle', as a piece of code which can automatically. DbC is one way that enables oracles. Property-based-testing is another.
+* [](https://arxiv.org/pdf/1512.02102.pdf). Argues for lifting contracts from assertions into (dependent) types.
+For instance fully specified types can avoiding needing to take failure into account in signature and implementation, because failing inputs are enforced as impossible by compiler.
+
+Use serialized representation for checking complex types in fail/pass examples. "RgbColor(#aabbcc)"
+Very many languages allow to attach custom serializers, and tools which benefit from them. Debuggers etc
+Reduces burden on grammar, as any string can be used. Can also be used to hide some examples of equivalence.
+
+
 JavaScript verification approaches
 
 * [Towards JavaScript Verification with the Dijkstra State Monad](http://research.microsoft.com/en-us/um/people/nswamy/papers/js2fs-dijkstra.pdf)
 * [Dependent Types for JavaScript](http://goto.ucsd.edu/~ravi/research/oopsla12-djs.pdf)
 * [SymJS: Automatic Symbolic Testing of JavaScript Web Applications](http://www.cs.utah.edu/~ligd/publications/SymJS-FSE14.pdf)
+* [Jalangi2: Symbolic execution / dynamic analysis](https://github.com/Samsung/jalangi2)
 * [Flow: static type checker for JavaScript](http://flowtype.org/). Gradual typing, manual opt-in annotations
+
 
 Artificial intelligence
 
 * [STRIPS](https://en.wikipedia.org/wiki/STRIPS)-style planning and answer-set programming, rely on pre- and post-conditions.
 See [Programming as planning](http://www.vpri.org/pdf/m2009001_prog_as.pdf) for a recent, integrated example.
 
-Novel verification approaches
+Interesting verification approaches
 
 * [Effect typing, inferred types based on their (side)effects](https://research.microsoft.com/en-us/um/people/daan/madoko/doc/koka-effects-2014.html)
+* Dependent typing,. Example are Idris and Agda.
+* [Extended static checking](https://en.wikipedia.org/wiki/Extended_static_checking). Often using propagations of weakest-precondition / strongest-postcondition from 
+[Predicate transformer semantics](https://en.wikipedia.org/wiki/Predicate_transformer_semantics), a sound framework for validating programs.
+* Symbolic execution
+* [Pex, automatic unit test generation](https://www.microsoft.com/en-us/research/publication/pex-white-box-test-generation-for-net/). Does not require any code annotations
+
+Contracts and embedded systems
+
+* Eiffel, Ada, SPARK
 
 ## Relation to theorem provers
 
@@ -537,3 +568,13 @@ Can one build it on one of the code-sharing sites?
 > It would be fantastic if I could casually throw in a proof while debugging a hard problem.
 
 [Hacker News: MichaelBurge on Idris](https://news.ycombinator.com/item?id=10856929)
+
+
+> Often I hear or read that just few tests covering a large portion of the code is not a valuable thing,
+> since few tests contain few assertions and thus, there is a high chance for a bug to remain undetected.
+> In other words, some pretend that high test coverage ratio of the code is not so much valuable.
+> But if the large portion of the code contains a well-written set of code contracts assertions, the situation is completely different.
+> During the few tests execution, tons of assertions (mainly Code Contracts assertions) have been checked.
+> In this condition, chances that a bug remains undetected are pretty low.
+[](http://codebetter.com/patricksmacchia/2010/07/26/code-contracts-and-automatic-testing-are-pretty-much-the-same-thing)
+
