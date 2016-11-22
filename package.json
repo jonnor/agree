@@ -1,6 +1,6 @@
 {
   "name": "agree",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Introspectable contracts programming for JavaScript",
   "author": "Jon Nordby <jononor@gmail.com> (http://www.jonnor.com)",
   "repository": {
