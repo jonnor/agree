@@ -9,7 +9,7 @@
   },
   "bugs": "http://github.com/jonnor/agree/issues",
   "license": "MIT",
-  "index": "nodeindex.js",
+  "main": "nodeindex.js",
   "files": [
     "dist",
     "src",
