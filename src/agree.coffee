@@ -394,14 +394,7 @@ agree.ClassContract = ClassContract
 agree.Class = (name) ->
     return new ClassContract name
 
-# Patch Promise.then to be able to introspect the chain
-originalThen = Promise.prototype.then
-Promise.prototype.then = (fulfill, reject) ->
-    newPromise = originalThen.apply this, [fulfill, reject]
-    newPromise._agreeParentPromise = this
-    return newPromise
-
-# Export our Promise variant. For introspection or compat with old JS runtimes
+# Export our Promise variant. For compat with old JS runtimes
 agree.Promise = Promise
 
 module.exports = agree
