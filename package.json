@@ -15,7 +15,7 @@
     "index.js"
   ],
   "scripts": {
-    "test": "mocha --reporter spec --compilers .coffee:coffee-script/register spec/*.coffee"
+    "test": "grunt test"
   },
   "engines": {
     "node": ">=0.10.0"
@@ -29,6 +29,9 @@
     "body-parser": "^1.14.2",
     "chai": "^1.9.1",
     "express": "^4.13.3",
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-mocha-test": "^0.13.2",
     "mocha": "^1.21.4"
   }
 }
