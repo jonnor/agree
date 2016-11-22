@@ -1,6 +1,6 @@
 
-agree = require '../'
-chai = require 'chai'
+agree = require '../' if not agree
+chai = require 'chai' if not chai
 
 describe 'Conditions', ->
 

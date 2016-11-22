@@ -7,7 +7,7 @@ module.exports = {
 		path: path.join(__dirname, "dist"),
 		publicPath: "dist/",
 		filename: "agree.js",
-		chunkFilename: "[chunkhash].js"
+        library: 'agree'
 	},
 	module: {
 		loaders: [

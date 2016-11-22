@@ -30,6 +30,17 @@ module.exports = ->
           'level': 'ignore'
 
     # Tests
+    coffee:
+      spec:
+        options:
+          bare: true
+        expand: true
+        cwd: 'spec'
+        src: '*.coffee'
+        dest: 'browser/spec'
+        ext: '.js'
+
+    # Node.js
     mochaTest:
       nodejs:
         src: ['spec/*.coffee']
@@ -44,14 +55,14 @@ module.exports = ->
         options:
           output: 'test/result.xml'
           reporter: 'spec'
-          urls: ['http://localhost:8000/spec/runner.html']
+          urls: ['./spec/runner.html']
 
   # Grunt plugins used for building
   @loadNpmTasks 'grunt-webpack'
 
   # Grunt plugins used for testing
-  #@loadNpmTasks 'grunt-mocha-phantomjs'
-  #@loadNpmTasks 'grunt-contrib-coffee'
+  @loadNpmTasks 'grunt-mocha-phantomjs'
+  @loadNpmTasks 'grunt-contrib-coffee'
   @loadNpmTasks 'grunt-mocha-test'
   #@loadNpmTasks 'grunt-coffeelint'
   #@loadNpmTasks 'grunt-contrib-connect'
@@ -62,7 +73,7 @@ module.exports = ->
 
   # Our local tasks
   @registerTask 'build', ['webpack']
-  @registerTask 'test', ['build', 'mochaTest']
+  @registerTask 'test', ['build', 'coffee', 'mochaTest', 'mocha_phantomjs']
 
   @registerTask 'default', ['test']
 
