@@ -60,7 +60,13 @@
 
 agree = {}
 
-Promise = require 'bluebird'
+# Export our Promise variant. For compat with old JS runtimes
+# Alternatively, consumers of the library can override agree.Promise to be a specific implementation
+if typeof Promise == 'undefined'
+    agree.Promise = require 'bluebird'
+else
+    agree.Promise = Promise
+
 introspection = require './introspection'
 common = require './common'
 agree.getContract = common.getContract
@@ -197,9 +203,9 @@ class FunctionEvaluator
             ret = ret.then (value) ->
                 [stop, checkErr] = postChecks value
                 if stop
-                    return Promise.reject checkErr
+                    return agree.Promise.reject checkErr
                 else
-                    return Promise.resolve value
+                    return agree.Promise.resolve value
         else
             postChecks ret
         return ret
@@ -393,8 +399,5 @@ agree.ClassContract = ClassContract
 
 agree.Class = (name) ->
     return new ClassContract name
-
-# Export our Promise variant. For compat with old JS runtimes
-agree.Promise = Promise
 
 module.exports = agree
