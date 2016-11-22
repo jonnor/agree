@@ -504,6 +504,11 @@ Interesting verification approaches
 Contracts and embedded systems
 
 * Eiffel, Ada, SPARK
+* [Contract Testing for Reliable Embedded Systems](http://archiv.ub.uni-heidelberg.de/volltextserver/15941/1/fajardo_thesis_submit.pdf), uses contracts also for specifying hardware,
+including environment, input levels, timing and logic set restrictions. Demonstrates an enforcing implementation of this for I2C devices, using FPGA.
+* [Executable Contracts for Incremental Prototypes of Embedded Systems](http://www.sciencedirect.com/science/article/pii/S1571066109001091)
+Includes a formal speification for reactive systems, based on step-relations (relations between consecutive changes in program environment),
+a component model with input/outputs, contracts composed of assume-guarantee constraints. And a simulation methodology which generates 'traces' (kinda symbolic execution) between such components.
 
 ## Relation to theorem provers
 
