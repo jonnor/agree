@@ -23,13 +23,14 @@ but requires *no build steps*, *no non-standard language features*, and is *intr
 * Lock down the core contracts API
 * Add more tests for core functionality
 * Do use-case exploration of a browser/frontend example
-* Remove CoffeeScript as run-time dependency
-* Setup build automated tests for browser
+* Run all automated tests under browser
 * Stabilize and document the testing and documentation tools
 
 Future
 
-* Add support for more types of invariants, including on properties
+* Support postcondition expressions that contain function inputs
+* Support postconditions expressions matching against 'old' instance members
+* Support invariants on properties
 
 For details see TODO/FIXME/XXX/MAYBE comments in the code.
 
