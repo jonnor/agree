@@ -1,13 +1,33 @@
 path = require 'path'
 
-#webpackConfig = require "./webpack.config.js"
+webpackConfig = require "./webpack.config.js"
 
 module.exports = ->
   # Project configuration
   pkg = @file.readJSON 'package.json'
 
   @initConfig
-    pkg: @file.readJSON 'package.json'
+
+    # Build for browser
+    webpack:
+      options: webpackConfig
+      build:
+        plugins: webpackConfig.plugins.concat()
+        name: 'agree.js'
+
+    # Web server for the browser tests
+    connect:
+      server:
+        options:
+          port: 8000
+          livereload: true
+
+    # Coding standards
+    coffeelint:
+      components: ['Gruntfile.coffee', 'spec/*.coffee']
+      options:
+        'max_line_length':
+          'level': 'ignore'
 
     # Tests
     mochaTest:
@@ -27,7 +47,7 @@ module.exports = ->
           urls: ['http://localhost:8000/spec/runner.html']
 
   # Grunt plugins used for building
-  #@loadNpmTasks 'grunt-webpack'
+  @loadNpmTasks 'grunt-webpack'
 
   # Grunt plugins used for testing
   #@loadNpmTasks 'grunt-mocha-phantomjs'
@@ -41,7 +61,7 @@ module.exports = ->
   #
 
   # Our local tasks
-  @registerTask 'build', []
+  @registerTask 'build', ['webpack']
   @registerTask 'test', ['build', 'mochaTest']
 
   @registerTask 'default', ['test']
