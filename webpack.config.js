@@ -7,8 +7,12 @@ module.exports = {
 		path: path.join(__dirname, "dist"),
 		publicPath: "dist/",
 		filename: "agree.js",
-        library: 'agree'
+        library: 'agree',
+        libraryTarget: 'umd'
 	},
+    externals: [{
+        'http' : 'commonjs http',
+    }],
 	module: {
 		loaders: [
             { test: /\.coffee$/, loader: "coffee-loader" },
