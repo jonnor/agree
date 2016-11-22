@@ -1,3 +1,0 @@
-#!/usr/bin/env node
-agree = require('../');
-agree.analyze.main();

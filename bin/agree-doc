@@ -1,4 +1,0 @@
-#!/usr/bin/env node
-require('coffee-script/register'); // FIXME: use compiled .js
-agree = require('../');
-agree.doc.main();
