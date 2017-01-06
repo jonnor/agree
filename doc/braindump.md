@@ -149,6 +149,7 @@ also be considered a failure (at least in stricter modes).
 
 ## References
 
+* Probably the outlined technique is a form of symbolic execution?
 * [Embedded-computing.com: Advanced static analysis meets contract-based programming]
 (http://embedded-computing.com/articles/advanced-meets-contract-based-programming/),
 explains motivation/concept of combining static analysis and contracts.
@@ -181,6 +182,37 @@ somewhere else than the code-under-test, one:
 - tools use this information to create & run testcases
 - a whole set of testcases is created automatically
 - they can be found & ran without any further setup
+
+The area of 'property-based testing' is useful to integrate here.
+
+# Agree and static typing
+
+There are now several production quality tools offering opt-in, gradual static typing for JavaScript.
+Notably:
+
+* [Flow](https://flowtype.org/)
+* [TypeScript](https://www.typescriptlang.org/)
+
+Does this make contracts unneccesary? Or their value to
+Are there benefits of using static typechecking and contracts together?
+
+Advantages:
+
+* Very advanced dataflow analysis, understands arbitrary JS
+* Type inference gives needs less typing to get checking
+* Typing is a well-known concept (compared to contracts) from popular languages, like Java/C/C++/C#
+* Zero runtime overhead
+
+Disadvantages:
+
+* Only works with plain JavaScript? Not dialects like CoffeeScript.
+May be possible to hack using annotations in comments
+* Not used for runtime checking. Ie. when called from plain JS, or for checking incoming JSON data.
+Note, there are some Json Schema <-> TypeScript conversion tools, allowing one source for both.
+* Cannot express things like dependent-types
+* Cannot be introspected at runtime
+* Cannot be used as oracle for property-based testing?
+* No example-based-testing, or fault-injection tools. But maybe those should be separate anyways?
 
 # Fault injection
 
@@ -423,6 +455,8 @@ All tools operate on this?
 
 Debugging (in-situ and retroactive)
 
+* Ability to trace async/Promise code
+Related: http://h14s.p5r.org/2012/05/tracing-promises.html
 * Ability to compare multiple different runs,
 looking at differences in input/output/conditions
 * Ability to see all contracts in
